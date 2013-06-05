@@ -16,12 +16,12 @@ parser.add_argument("Infile", help="XYZ file")
 parser.add_argument("Outfile", help="Config file")
 
 parser.add_argument("-b", "--box", type=float, help="box size in Angstöms", required=True)
-parser.add_argument("-e", "--elements", required=True, type=str, nargs="+", help="list of element labels and weights label weight label weight ...")
+#parser.add_argument("-e", "--elements", required=True, type=str, nargs="+", help="list of element labels and weights label weight label weight ...")
 args = parser.parse_args()
 #print args
 #exit()
 
-def write_file(name, data, box, weights, Format='config'):
+def write_file(name, data, box, weights=[], Format='config'):
 
     if Format == 'xyz'or Format == 'both':
         opf = open(name+".xyz", "w")
@@ -36,7 +36,7 @@ def write_file(name, data, box, weights, Format='config'):
         opf = open(name, "w")
         line1 = ff.FortranRecordWriter('(I10, I10, I10, F20.10)')
         line_cell = ff.FortranRecordWriter('(3F20.10)')
-        line_atom1 = ff.FortranRecordWriter('(A8, I10, F20.10)')
+        line_atom1 = ff.FortranRecordWriter('(A8, I10)') #, F20.10)')
         line_atom2 = ff.FortranRecordWriter('(3F20.10)')
 
         opf.write("\n"+line1.write([0, 3, len(data), 0.0])+"\n")
@@ -47,7 +47,7 @@ def write_file(name, data, box, weights, Format='config'):
 #       print coords
 
         for t in range(len(data)):
-            opf.write(line_atom1.write([data[t][0], t+1, float(weights[data[t][0]])])+"\n")
+            opf.write(line_atom1.write([data[t][0], t+1])+"\n") #, float(weights[data[t][0]])])+"\n")
             opf.write(line_atom2.write([data[t][1][0], data[t][1][1], data[t][1][2] ])+"\n" )
 
         opf.close()
@@ -74,10 +74,10 @@ def ReadXYZ(filename):
 
 data = ReadXYZ(args.Infile)
 
-if (len(args.elements)%2) != 0:
-    raise Exception("--elements requires an even number of arguments")
+#if (len(args.elements)%2) != 0:
+#    raise Exception("--elements requires an even number of arguments")
 
-ElementDict = dict(zip(args.elements[::2], args.elements[1::2]))
+#ElementDict = dict(zip(args.elements[::2], args.elements[1::2]))
 
-write_file(args.Outfile, data, args.box, ElementDict)
+write_file(args.Outfile, data, args.box) #, ElementDict)
 
