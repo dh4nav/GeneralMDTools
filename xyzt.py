@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.cluster.hierarchy as sch
 import scipy.spatial.distance as ssd
+#import unittest as ut
 
 class GetXYZIter:
     def __init__(self, filename):
@@ -18,10 +19,21 @@ class GetXYZIter:
     def __iter__(self):
         return self
 
+    def get_last_frame(self):
+        frame = []
+        for frame in self:
+            pass
+        return frame
+
     def next(self):
         self.current += 1
         self.framelength = int(self.reader().strip()) #filehandle.readline().strip())
-        self.boxsize = float(self.reader().strip()) #filehandle.readline().strip())
+        line2 = self.reader().strip()
+        try:
+            self.boxsize = [float(line2), float(line2), float(line2)] #filehandle.readline().strip())
+        except ValueError:
+            self.boxsize = None 
+
 #    if args.boxsize != 0.0:
 #        read_boxsize = args.boxsize
         elements = []
@@ -32,7 +44,7 @@ class GetXYZIter:
             elements.append(ele[0])
             coordinates.append([float(ele[1]), float(ele[2]), float(ele[3])])
 
-        return {'elements':elements, 'coordinates':np.array(coordinates), 'boxvector':[self.boxsize, self.boxsize, self.boxsize], 'framenumber':self.current, 'filename':self.filename}
+        return {'elements':elements, 'coordinates':np.array(coordinates), 'boxvector':self.boxsize, 'framenumber':self.current, 'filename':self.filename}
 
 
 def Filter(ec, remove=None, keep=None):
