@@ -3,7 +3,7 @@
 import os, sys
 import argparse as ap
 
-parser = ap.ArgumentParser(description="Convert a DLPOLY2/DLPOLY Classic REVCON or CONFIG file into a XYZ file")
+parser = ap.ArgumentParser(description="Multiply a solvent box")
 
 parser.add_argument("Infile", help="XYZ Input file")
 parser.add_argument("Outfile", help="XYZ Output file")
