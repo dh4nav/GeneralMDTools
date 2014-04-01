@@ -46,6 +46,23 @@ class GetXYZIter:
 
         return {'elements':elements, 'coordinates':np.array(coordinates), 'boxvector':self.boxsize, 'framenumber':self.current, 'filename':self.filename}
 
+def rotate_single_vector_around_origin(vector, angle_x, angle_y, angle_z):
+    return np.array([
+        (vector[0] * np.cos(angle_y) * np.cos(angle_z)) 
+            + (vector[1] * ( (np.cos(angle_x) * np.sin(angle_z) ) + ( np.sin(angle_x) * np.sin(angle_y) * np.cos(angle_z) ) )) 
+            + (vector[2] * ( (np.sin(angle_x) * np.sin(angle_z) ) - ( np.cos(angle_x) * np.sin(angle_y) * np.cos(angle_z) ) )) , 
+
+        ( vector[0] * (-1.0 * np.cos(angle_y)) * np.sin(angle_z) ) 
+            #+ (vector[1] * ( (np.cos(angle_x) * np.cos(angle_z) ) - ( np.sin(angle_x) * np.sin(angle_y) + np.sin(angle_z) ) )) 
+            + (vector[2] * ( (np.sin(angle_x) * np.cos(angle_z) ) + ( np.cos(angle_x) * np.sin(angle_y) + np.sin(angle_z) ) )) , 
+        
+        (vector[0] * np.sin(angle_y) ) 
+            + (vector[1] * (-1.0 * np.sin(angle_x)) * np.cos(angle_y)) 
+            + (vector[2] * np.cos(angle_x) * np.cos(angle_y))])
+
+def rotate_around_origin(ec, angle_x, angle_y, angle_z):
+    ec['coordinates'] = rotate_single_vector_around_origin(ec['coordinates'], angle_x * (np.pi / 180.0), angle_y * (np.pi / 180.0), angle_z* (np.pi / 180.0))
+    return ec
 
 def Filter(ec, remove=None, keep=None):
     out1 = []
