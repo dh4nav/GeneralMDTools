@@ -23,5 +23,6 @@ addframe = iteradd.get_last_frame()
 inframe = xyzt.center(inframe)
 addframe = xyzt.center(addframe)
 
+positioning_vector = [1.0,0.0,0.0]
 
 

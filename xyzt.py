@@ -46,6 +46,10 @@ class GetXYZIter:
 
         return {'elements':elements, 'coordinates':np.array(coordinates), 'boxvector':self.boxsize, 'framenumber':self.current, 'filename':self.filename}
 
+def get_extreme_value(vectors):
+    #return vectors.flatten()
+    return np.absolute(vectors.flatten()).max()
+
 def rotate_single_vector_around_origin(vector, angle_x, angle_y, angle_z):
     return np.array([
         (vector[0] * np.cos(angle_y) * np.cos(angle_z)) 

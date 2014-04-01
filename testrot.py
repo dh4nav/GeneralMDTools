@@ -27,4 +27,4 @@ print rz['coordinates'][0] ,
 print rz['coordinates'][1] ,
 print rz['coordinates'][2] 
 
-
+print xyzt.get_extreme_value(lf['coordinates'])
