@@ -69,18 +69,21 @@ def rotate_around_origin(ec, angle_x, angle_y, angle_z):
     return ec
 
 def Filter(ec, remove=None, keep=None):
+    print ec
+    print remove
+    print keep
     out1 = []
     out2 = []
-    if remove != None:
+    if remove is not None:
         for c in zip(ec['elements'], ec['coordinates']):
             if c[0] in remove:
                 pass
             else:
                 out1.append(c[0])
                 out2.append(c[1])
-    elif keep != None:
+    elif keep is not None:
         for c in zip(ec['elements'], ec['coordinates']):
-            if c[0] in remove:
+            if c[0] in keep:
                 out1.append(c[0])
                 out2.append(c[1])
     ec['elements'] = out1
