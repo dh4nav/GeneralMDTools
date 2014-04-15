@@ -69,9 +69,9 @@ def rotate_around_origin(ec, angle_x, angle_y, angle_z):
     return ec
 
 def Filter(ec, remove=None, keep=None):
-    print ec
-    print remove
-    print keep
+    #print ec
+    #print remove
+    #print keep
     out1 = []
     out2 = []
     if remove is not None:
@@ -117,8 +117,10 @@ def Center(ec):
 
     return ec
 
-
 def Move(ec, vect):
+    move(ec, vect)
+
+def move(ec, vect):
     ec['coordinates'] = np.array(ec['coordinates'] + np.array(vect))
     return ec
 
@@ -137,3 +139,74 @@ def Write_XYZ(ec, filename, append=True):
             opf.write(str(e) + " " + str(c[0]) + " " + str(c[1]) + " " + str(c[2]) + "\n")
 
     opf.close()
+
+def Split_XYZ(ec, start, end):
+    ecout = ec.copy()
+
+    ecout['elements'] = ec['elements'][start:end].copy()
+    ecout['coordinates'] = np.array(ec['coordinates'][start:end].copy())
+
+    return ecout
+
+def Merge_XYZ(eclist):
+    ecout = eclist[0].copy()
+
+    for ec in elist[1:]:
+        ecout['elements'].extend(ec['elements'])
+        ecout['coordinates'].extend(ec['coordinates'])
+
+        if ecout['boxvector'][0] < ec['boxvector'][0]:
+            ecout['boxvector'][0] = ec['boxvector'][0]
+        if ecout['boxvector'][1] < ec['boxvector'][1]:
+            ecout['boxvector'][1] = ec['boxvector'][1]
+        if ecout['boxvector'][2] < ec['boxvector'][2]:
+            ecout['boxvector'][2] = ec['boxvector'][2]
+
+def debox_coordinate(ref, val, box):
+    if (ref - val) > (box/2.0):
+        return (val - box)
+    elif (ref - val) < ((-1.0) * (box/2.0)):
+        return (val + box)
+    else:
+        return val
+
+def get_center_of_mass(ec):
+    summator = [0.0,0.0,0.0]
+
+    for c in ec['coordinates']:
+        summator[0] = summator[0] + c[0]
+        summator[1] = summator[1] + c[1]
+        summator[2] = summator[2] + c[2]
+
+    summator[0] = summator[0] / float(len(ec['coordinates']))
+    summator[1] = summator[1] / float(len(ec['coordinates']))
+    summator[2] = summator[2] / float(len(ec['coordinates']))
+
+    return summator
+
+def debox_Intramolecule(ec, box):
+    ecout = ec.copy()
+    newcoordinates = [ec['coordinates'][0]]
+
+    for c in ec['coordinates'][1:]:
+        newcoordinates.append([debox_coordinate(newcoordinates[0][0], c[0], box),debox_coordinate(newcoordinates[0][1], c[1], box),debox_coordinate(newcoordinates[0][2], c[2], box)])
+
+    ecout['coordinates'] = np.array(newcoordinates)
+    return ecout
+    
+def debox_Intermolecule(eclist, box):
+    
+    centerref = get_center_of_mass(ec[0])
+
+    ecoutlist = [eclist[0]]
+
+    for e in eclist[1:]
+        center = get_center_of_mass(e)
+        centerdeboxed = [debox_coordinate(centerref[0], get_center_of_mass(e)[0], box),debox_coordinate(centerref[1], get_center_of_mass(e)[1], box),debox_coordinate(centerref[2], get_center_of_mass(e)[2], box)]
+        
+        diff = [centerdeboxed[0] - center[0], centerdeboxed[1] - center[1], centerdeboxed[2] - center[2]]
+
+        ecoutlist.append(move(e, diff))
+
+    return ecoutlist
+
