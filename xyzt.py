@@ -46,6 +46,14 @@ class GetXYZIter:
 
         return {'elements':elements, 'coordinates':np.array(coordinates), 'boxvector':self.boxsize, 'framenumber':self.current, 'filename':self.filename}
 
+    def __getitem__(self, index):
+        newiter = GetXYZIter(self.filename)
+        
+        for n in range(index):
+            newiter.next()
+        return newiter.next()
+
+
 def get_extreme_value(vectors):
     #return vectors.flatten()
     return np.absolute(vectors.flatten()).max()
@@ -69,11 +77,16 @@ def rotate_around_origin(ec, angle_x, angle_y, angle_z):
     return ec
 
 def Filter(ec, remove=None, keep=None):
+    filter(ec, remove, keep)
+
+def filter(ec, remove=None, keep=None):
     #print ec
     #print remove
     #print keep
     out1 = []
     out2 = []
+    ecout = ec.copy()
+
     if remove is not None:
         for c in zip(ec['elements'], ec['coordinates']):
             if c[0] in remove:
@@ -86,10 +99,10 @@ def Filter(ec, remove=None, keep=None):
             if c[0] in keep:
                 out1.append(c[0])
                 out2.append(c[1])
-    ec['elements'] = out1
-    ec['coordinates'] = np.array(out2)
+    ecout['elements'] = out1
+    ecout['coordinates'] = np.array(out2)
 
-    return ec
+    return ecout
 
 
 def Dist(x0, x1, boxvect):
@@ -107,6 +120,9 @@ def DistDist(x0, x1, boxvect):
 
 
 def Center(ec):
+    center(ec)
+
+def center(ec):
     summator = np.array([0.0,0.0,0.0])
     for c in ec['coordinates']:
         summator = summator + c
@@ -125,6 +141,9 @@ def move(ec, vect):
     return ec
 
 def Write_XYZ(ec, filename, append=True):
+    write(ec, filename, append=True)
+
+def write(ec, filename, append=True):
     if type(ec) == dict:
         ec = [ec]
 
@@ -140,18 +159,19 @@ def Write_XYZ(ec, filename, append=True):
 
     opf.close()
 
-def Split_XYZ(ec, start, end):
+def split(ec, start, end):
     ecout = ec.copy()
 
-    ecout['elements'] = ec['elements'][start:end].copy()
-    ecout['coordinates'] = np.array(ec['coordinates'][start:end].copy())
+    ecout['elements'] = ec['elements'][start:end]
+    ecout['coordinates'] = np.array(ec['coordinates'][start:end])
 
     return ecout
 
-def Merge_XYZ(eclist):
+def merge(eclist):
     ecout = eclist[0].copy()
+    ecout['coordinates'] = eclist[0]['coordinates'].tolist() 
 
-    for ec in elist[1:]:
+    for ec in eclist[1:]:
         ecout['elements'].extend(ec['elements'])
         ecout['coordinates'].extend(ec['coordinates'])
 
@@ -162,11 +182,14 @@ def Merge_XYZ(eclist):
         if ecout['boxvector'][2] < ec['boxvector'][2]:
             ecout['boxvector'][2] = ec['boxvector'][2]
 
+    ecout['coordinates'] = np.array(ecout['coordinates'])
+    return ecout
+
 def debox_coordinate(ref, val, box):
     if (ref - val) > (box/2.0):
-        return (val - box)
-    elif (ref - val) < ((-1.0) * (box/2.0)):
         return (val + box)
+    elif (ref - val) < ((-1.0) * (box/2.0)):
+        return (val - box)
     else:
         return val
 
@@ -184,7 +207,7 @@ def get_center_of_mass(ec):
 
     return summator
 
-def debox_Intramolecule(ec, box):
+def debox_intramolecule(ec, box):
     ecout = ec.copy()
     newcoordinates = [ec['coordinates'][0]]
 
@@ -194,13 +217,13 @@ def debox_Intramolecule(ec, box):
     ecout['coordinates'] = np.array(newcoordinates)
     return ecout
     
-def debox_Intermolecule(eclist, box):
+def debox_intermolecule(eclist, box):
     
-    centerref = get_center_of_mass(ec[0])
+    centerref = get_center_of_mass(eclist[0])
 
     ecoutlist = [eclist[0]]
 
-    for e in eclist[1:]
+    for e in eclist[1:]:
         center = get_center_of_mass(e)
         centerdeboxed = [debox_coordinate(centerref[0], get_center_of_mass(e)[0], box),debox_coordinate(centerref[1], get_center_of_mass(e)[1], box),debox_coordinate(centerref[2], get_center_of_mass(e)[2], box)]
         

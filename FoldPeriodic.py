@@ -25,7 +25,7 @@ def ReadXYZ(filename):
             trajectorylength = int(line.strip())+2
             outputdata.append([])
         elif num == 1:
-            outputdata[-1].append(float(line))
+            outputdata[-1].append(line)
         elif (num%trajectorylength) == 0:
             trajectorylength = int(line.strip())+2
             outputdata.append([])
@@ -52,10 +52,10 @@ print "fold"
 for t in od:
     fd.append([])
     traj = t[1:]
-    if args.box != 0.0:
+    if args.box != None:
         boxsizehalf = args.box/2
     else:
-        boxsizehalf = t[0]/2.0
+        boxsizehalf = float(t[0])/2.0
     print boxsizehalf
     #firstatom = traj[0]
     #print firstatom
