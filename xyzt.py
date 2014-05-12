@@ -77,6 +77,7 @@ def rotate_around_origin(ec, angle_x, angle_y, angle_z):
     return ec
 
 def Filter(ec, remove=None, keep=None):
+#    print "F"
     filter(ec, remove, keep)
 
 def filter(ec, remove=None, keep=None):
@@ -101,7 +102,8 @@ def filter(ec, remove=None, keep=None):
                 out2.append(c[1])
     ecout['elements'] = out1
     ecout['coordinates'] = np.array(out2)
-
+#    print "f"
+#    print ecout
     return ecout
 
 
@@ -144,6 +146,8 @@ def Write_XYZ(ec, filename, append=True):
     write(ec, filename, append=True)
 
 def write(ec, filename, append=True):
+    print ec
+
     if type(ec) == dict:
         ec = [ec]
 
@@ -151,6 +155,9 @@ def write(ec, filename, append=True):
         opf = open(filename, "a")
     else:
         opf = open(filename, "w")
+
+    #print ec
+    #exit()
 
     for f in ec:
         opf.write(str(len(f['elements'])) + "\n" + str(f['boxvector'][0]) + "\n")

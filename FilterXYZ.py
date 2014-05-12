@@ -17,9 +17,14 @@ args = parser.parse_args()
 
 xyz_iter =  xyzt.GetXYZIter(args.input)
 
+print args
+
 for n, ec in enumerate(xyz_iter):
-    print n
-    xyzt.Write_XYZ(xyzt.Filter(ec, keep=args.keep, remove=args.remove), args.output, append=True)
+    #print n
+    #print xyzt.Filter(ec, keep=args.keep, remove=args.remove)
+    #print xyzt.filter(ec, keep=args.keep, remove=args.remove)
+    #exit()
+    xyzt.Write_XYZ(xyzt.filter(ec, keep=args.keep, remove=args.remove), args.output, append=True)
 
 
 
