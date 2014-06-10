@@ -32,7 +32,7 @@ class GetXYZIter:
         try:
             self.boxsize = [float(line2), float(line2), float(line2)] #filehandle.readline().strip())
         except ValueError:
-            self.boxsize = None 
+            self.boxsize = None
 
 #    if args.boxsize != 0.0:
 #        read_boxsize = args.boxsize
@@ -48,7 +48,7 @@ class GetXYZIter:
 
     def __getitem__(self, index):
         newiter = GetXYZIter(self.filename)
-        
+
         for n in range(index):
             newiter.next()
         return newiter.next()
@@ -60,16 +60,16 @@ def get_extreme_value(vectors):
 
 def rotate_single_vector_around_origin(vector, angle_x, angle_y, angle_z):
     return np.array([
-        (vector[0] * np.cos(angle_y) * np.cos(angle_z)) 
-            + (vector[1] * ( (np.cos(angle_x) * np.sin(angle_z) ) + ( np.sin(angle_x) * np.sin(angle_y) * np.cos(angle_z) ) )) 
-            + (vector[2] * ( (np.sin(angle_x) * np.sin(angle_z) ) - ( np.cos(angle_x) * np.sin(angle_y) * np.cos(angle_z) ) )) , 
+        (vector[0] * np.cos(angle_y) * np.cos(angle_z))
+            + (vector[1] * ( (np.cos(angle_x) * np.sin(angle_z) ) + ( np.sin(angle_x) * np.sin(angle_y) * np.cos(angle_z) ) ))
+            + (vector[2] * ( (np.sin(angle_x) * np.sin(angle_z) ) - ( np.cos(angle_x) * np.sin(angle_y) * np.cos(angle_z) ) )) ,
 
-        ( vector[0] * (-1.0 * np.cos(angle_y)) * np.sin(angle_z) ) 
-            #+ (vector[1] * ( (np.cos(angle_x) * np.cos(angle_z) ) - ( np.sin(angle_x) * np.sin(angle_y) + np.sin(angle_z) ) )) 
-            + (vector[2] * ( (np.sin(angle_x) * np.cos(angle_z) ) + ( np.cos(angle_x) * np.sin(angle_y) + np.sin(angle_z) ) )) , 
-        
-        (vector[0] * np.sin(angle_y) ) 
-            + (vector[1] * (-1.0 * np.sin(angle_x)) * np.cos(angle_y)) 
+        ( vector[0] * (-1.0 * np.cos(angle_y)) * np.sin(angle_z) )
+            #+ (vector[1] * ( (np.cos(angle_x) * np.cos(angle_z) ) - ( np.sin(angle_x) * np.sin(angle_y) + np.sin(angle_z) ) ))
+            + (vector[2] * ( (np.sin(angle_x) * np.cos(angle_z) ) + ( np.cos(angle_x) * np.sin(angle_y) + np.sin(angle_z) ) )) ,
+
+        (vector[0] * np.sin(angle_y) )
+            + (vector[1] * (-1.0 * np.sin(angle_x)) * np.cos(angle_y))
             + (vector[2] * np.cos(angle_x) * np.cos(angle_y))])
 
 def rotate_around_origin(ec, angle_x, angle_y, angle_z):
@@ -146,8 +146,8 @@ def Write_XYZ(ec, filename, append=True):
     write(ec, filename, append=True)
 
 def write(ec, filename, append=True):
-    print ec
-
+    #print ec
+    print ".",
     if type(ec) == dict:
         ec = [ec]
 
@@ -176,7 +176,7 @@ def split(ec, start, end):
 
 def merge(eclist):
     ecout = eclist[0].copy()
-    ecout['coordinates'] = eclist[0]['coordinates'].tolist() 
+    ecout['coordinates'] = eclist[0]['coordinates'].tolist()
 
     for ec in eclist[1:]:
         ecout['elements'].extend(ec['elements'])
@@ -223,20 +223,25 @@ def debox_intramolecule(ec, box):
 
     ecout['coordinates'] = np.array(newcoordinates)
     return ecout
-    
-def debox_intermolecule(eclist, box):
-    
-    centerref = get_center_of_mass(eclist[0])
 
-    ecoutlist = [eclist[0]]
+def debox_intermolecule(eclist, box, center_on=0):
 
-    for e in eclist[1:]:
-        center = get_center_of_mass(e)
-        centerdeboxed = [debox_coordinate(centerref[0], get_center_of_mass(e)[0], box),debox_coordinate(centerref[1], get_center_of_mass(e)[1], box),debox_coordinate(centerref[2], get_center_of_mass(e)[2], box)]
-        
-        diff = [centerdeboxed[0] - center[0], centerdeboxed[1] - center[1], centerdeboxed[2] - center[2]]
+    if center_on < 0:
+        center_on = len(eclist['coordinates']) + center_on
 
-        ecoutlist.append(move(e, diff))
+    centerref = get_center_of_mass(eclist[center_on])
+
+    ecoutlist = []
+
+    for n, e in enumerate(eclist[:]):
+        if n == center_on:
+            ecoutlist.append(e)
+        else:
+            center = get_center_of_mass(e)
+            centerdeboxed = [debox_coordinate(centerref[0], get_center_of_mass(e)[0], box),debox_coordinate(centerref[1], get_center_of_mass(e)[1], box),debox_coordinate(centerref[2], get_center_of_mass(e)[2], box)]
+
+            diff = [centerdeboxed[0] - center[0], centerdeboxed[1] - center[1], centerdeboxed[2] - center[2]]
+
+            ecoutlist.append(move(e, diff))
 
     return ecoutlist
-

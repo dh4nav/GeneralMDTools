@@ -44,14 +44,19 @@ globallinenum = 0
 
 lastelement = ""
 
+framecounter = 0
+
 inf = open(args.HISTORY, "r")
 opf = open(args.XYZ + ".xyz", "w")
 try:
     for n,l in enumerate(inf):
-        if args.verbose: 
-            print "linenum: " + str(linenum)
         
         if l.find("timestep") != -1:
+            if args.verbose:
+                framecounter += 1
+                if (framecounter%1000 == 0):
+                    print framecounter
+
             typekey = int(l.split()[3].strip())
             boxkey = int(l.split()[4].strip())
             numlines = int(l.split()[2].strip()) * (typekey + 2)
