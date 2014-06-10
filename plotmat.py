@@ -129,6 +129,20 @@ class MainLoop(cmd.Cmd):
         self.consume(s)
 
 
+    def do_average(self, s):
+        el = self.get_this_command(s)
+
+        datareduced = self.reduce_data(data, [el[0]], self.limits)
+
+        adder = 0.0
+        counter = 0.0
+
+        for d in datareduced[0]:
+            adder += d
+            counter += 1.0
+
+        print str(adder/counter)
+
     def do_quit(self, s):
         return True
 
