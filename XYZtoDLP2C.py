@@ -10,16 +10,25 @@ import numpy as np
 
 import argparse as ap
 
+import xyzt
+
+
 parser = ap.ArgumentParser(description="Convert a DLPOLY2/DLPOLY Classic REVCON or CONFIG file into a XYZ file")
 
 parser.add_argument("Infile", help="XYZ file")
 parser.add_argument("Outfile", help="Config file")
 
-parser.add_argument("-b", "--box", type=float, help="box size in Angstöms", required=True)
+parser.add_argument("-b", "--box", type=float, help="box size in Angstöm")
+#", required=True)
+
+parser.add_argument("-r", "--readbox", type=bool) 
+#, action=store_true)
 #parser.add_argument("-e", "--elements", required=True, type=str, nargs="+", help="list of element labels and weights label weight label weight ...")
 args = parser.parse_args()
 #print args
 #exit()
+
+boxsize = 0.0
 
 def write_file(name, data, box, weights=[], Format='config'):
 
@@ -60,7 +69,10 @@ def ReadXYZ(filename):
         if n == 0:
             pass
         elif n==1:
-            pass
+            if args.readbox:
+                boxsize = float(l,strip())
+            else:
+                pass
         else:
             elem = l.strip().split()
             if len(elem) == 4:
@@ -72,12 +84,20 @@ def ReadXYZ(filename):
     inf.close()
     return outarray
 
-data = ReadXYZ(args.Infile)
+xyz_iter =  xyzt.GetXYZIter(args.Infile)
 
-#if (len(args.elements)%2) != 0:
-#    raise Exception("--elements requires an even number of arguments")
 
-#ElementDict = dict(zip(args.elements[::2], args.elements[1::2]))
+for n, ec in enumerate(xyz_iter):
 
-write_file(args.Outfile, data, args.box) #, ElementDict)
+
+    if args.box != None:
+        boxsize = args.box
+
+    else:
+        boxsize = ec['boxvector'][0]
+
+    print ec
+    data = zip(ec['elements'], ec['coordinates'])
+
+    write_file(args.Outfile, data, boxsize) #, ElementDict)
 
