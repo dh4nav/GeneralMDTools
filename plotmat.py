@@ -25,8 +25,12 @@ class MainLoop(cmd.Cmd):
         if len(el) > 1:
             self.onecmd(';'.join(el[1:]))
 
-    def get_this_command(self, s):
+    def get_this_command(self, s, min_args=0):
         el = s.strip().split(';')
+        if len(el) < min_args:
+            print "Error: A minimum of " + str(min_args) + " arguments is required"
+            return False
+
         print el[0].strip().split()
         return el[0].strip().split()
 
@@ -94,7 +98,7 @@ class MainLoop(cmd.Cmd):
                     print datareduced[0][0:2]
                     pylab.hist(datareduced[0], bins=bins, histtype="step", weights = (1.0 / np.sin(datareduced[0])))
             else:
-                pylab.hist(datareduced[0], bins=bins, histtype="step")#, normed=True)
+                pylab.hist(datareduced[0], bins=bins, histtype="step", normed=True)
 
 
 
@@ -104,12 +108,68 @@ class MainLoop(cmd.Cmd):
         pylab.show(block=False)
         self.consume(s)
 
+
+    def do_rdf(self, s):
+        el = self.get_this_command(s)
+
+        datareduced = self.reduce_data(data, [el[0]], self.limits)
+
+        bins = 100
+
+        if len(datareduced[0]) == 0:
+
+            print "No Data"
+            return
+
+        weights = np.reciprocal(np.square(datareduced[0]))
+
+        hist, bins = np.histogram(datareduced[0], weights=weights, bins=bins)
+
+        hist_reduced = []
+
+        for n, h in enumerate(hist):
+            hist_reduced.append(h / ((bins[n+1]**3) - (bins[n]**3)))
+
+        bin_centers = []
+        
+        for n in range(len(bins)-1):
+            bin_centers.append(bins[n] + ((bins[n+1]-bins[n]) * 0.5))
+
+        pylab.plot(bin_centers, hist_reduced)
+        
+
+        #first_average_index = len(hist) - int(float(len(hist)) * 0.05)
+        #average_counter = 0
+        #average_summator = 0.0
+        #for bin_index in range(first_average_index, len(hist)):
+        #    average_counter += 1
+        #    average_summator += hist[bin_index]
+        #average = average_summator/float(average_counter)
+
+        #weights_scaled = weights / average
+
+        #pylab.figure(0)
+        #pylab.hist(datareduced[0], bins=bins, histtype="step", weights=weights_scaled)#, weights = weights)
+        pylab.show(block=False)
+
+        #if "int" in el:
+            #pylab.close(1)
+        #    pylab.figure(1)
+        #    pylab.hist(datareduced[0], bins=bins, histtype="step", cumulative=True) #,weights=weights_scaled)#, weights = weights)
+        #    pylab.show(block=False)
+
+
+        #pylab.figure(0)
+        self.consume(s)
+
+
+
     def do_hist2(self, s):
         el = self.get_this_command(s)
 
         datareduced = self.reduce_data(data, [el[0], el[1]], self.limits)
 
-        bins = 50
+        bins = 25
 
 #        if len(el) > 1:
 #            bins = int(el[1])
@@ -119,7 +179,7 @@ class MainLoop(cmd.Cmd):
                 if el[2].lower() == "log":
                     pylab.hist2d(datareduced[0], datareduced[1], bins=bins, norm=mc.LogNorm())#, normed=True)
             else:
-                pylab.hist2d(datareduced[0], datareduced[1], bins=bins)#, normed=True)
+                pylab.hist2d(datareduced[0], datareduced[1], bins=bins, normed=True, range=[[0.0,30.0],[0.0,30.0]])
             pylab.colorbar()
             pylab.show(block=False)
 
