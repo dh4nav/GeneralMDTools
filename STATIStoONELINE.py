@@ -12,12 +12,15 @@ opv = []
 end = True
 count = 0
 for n, l in enumerate(ipf):
-    if n == 0:
+    if l.strip() == "":
+        pass
+    elif n == 0:
         pass
     elif n == 1:
         pass
     elif end == True:
         el = l.strip().split()
+        print el
         count = 2 + int(el[2])
         opv.append([int(el[0]) , float(el[1])])
         end = False

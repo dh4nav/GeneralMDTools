@@ -354,14 +354,7 @@ class MainLoop(cmd.Cmd):
         ipf = open(el0[0][0], "r")
         
         for n,l in enumerate(ipf):
-            el1 = l.strip().split()
-            #print n
-            dbuffer = [n]
-
-            for e in el1:
-                dbuffer.append(float(e))
-
-            datasets[-1][0].append(dbuffer)
+            dataset[-1][0].append([n] + map(lambda x: float(x), [n].extend(l.strip().split())))
 
         datasets[-1][1] = el0[0][0]
         if 'name' in el0[1]:
