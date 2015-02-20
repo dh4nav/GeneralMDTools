@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
+#import pdb
 import numpy as np
 import pylab
 import cmd
@@ -12,6 +12,9 @@ import matplotlib.colors as mc
 datarows = []
 datareduced = []
 data = []
+
+datasets = []
+current_dataset = -1
 
 #Anonymous helper functions
 
@@ -336,16 +339,54 @@ class MainLoop(cmd.Cmd):
                     return False
         return True
 
-ipf = open(sys.argv[1])
+    def do_load(self, s):
 
-for n,l in enumerate(ipf):
-    el = l.strip().split()
-    #print n
-    dbuffer = [n]
-    for e in el:
-        dbuffer.append(float(e))
+        global current_dataset
+        global data
+        global datasets
 
-    data.append(dbuffer)
+        el0 = self.get_this_command(s, min_args=1)
+        
+        datasets.append([[], "", ""])
+
+        current_dataset = len(datasets)-1
+
+        ipf = open(el0[0][0], "r")
+        
+        for n,l in enumerate(ipf):
+            datasets[-1][0].append([n] + map(lambda x: float(x), l.strip().split()))
+
+        datasets[-1][1] = el0[0][0]
+        if 'name' in el0[1]:
+            datasets[-1][2] = el0[1]['name']
+        else:
+            datasets[-1][2] = el0[0][0]
+
+        data = datasets[-1][0]
+
+#        print datasets
+
+    def do_set(self,s):
+
+        global current_dataset
+        global data
+        el0 = self.get_this_command(s, min_args=1)
+
+        num = int(el0[0][0])
+        if num > -1 and num < len(datasets):
+            data = datasets[num][0]
+
+        current_dataset = num
+
+        print "Current Dataset #" + str(num) + ": " + datasets[num][2]
+
+    def do_list(self, s):
+        for n, l in enumerate(datasets):
+            print "Dataset #" + str(n) + ": " + l[2]
+
+        print " -------\r\nCurrent Dataset #" + str(current_dataset) + ": " + datasets[current_dataset][2]
+
+       # print data
 
 #print data
 
