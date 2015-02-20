@@ -373,7 +373,7 @@ class MainLoop(cmd.Cmd):
         el0 = self.get_this_command(s, min_args=1)
 
         num = int(el0[0][0])
-        if num > 0 and num < len(datasets):
+        if num > -1 and num < len(datasets):
             data = datasets[num][0]
 
         current_dataset = num
