@@ -3,7 +3,7 @@ import argparse as ap
 
 parser = ap.ArgumentParser(description="Convert a Gaussian Output to XYZ")
 parser.add_argument("-i", "--input" , type=ap.FileType('r'), help="Input File", required=True)
-parser.add_argument("-o", "--output" , help="Output File", required=True)
+parser.add_argument("-o", "--output" , help="Output File", default=None)
 args = parser.parse_args()
 
 
@@ -27,6 +27,9 @@ def Print_XYZ(buf, filename):
     opf.close()
 
 readmode = 0
+
+if args.output == None:
+    args.output = args.input
 
 lines = args.input.readlines()
 lines2 = [x for x in lines if x.strip() != ""]
