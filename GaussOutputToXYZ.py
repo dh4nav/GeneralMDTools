@@ -53,8 +53,8 @@ if len(archive_sections_buffer) > 1:
             Print_XYZ(b[3][1:], args.output + "." + str(n) + ".xyz")
 
 else:
-    if len(b) > 3:
-        Print_XYZ(b[3][1:], args.output + ".xyz")
+    if len(archive_sections_buffer[0]) > 3:
+        Print_XYZ(archive_sections_buffer[0][3][1:], args.output + ".xyz")
 
 
 #args.output.write(str(len(lines2)) + "\n \n")
