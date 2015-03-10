@@ -29,7 +29,7 @@ def Print_XYZ(buf, filename):
 readmode = 0
 
 if args.output == None:
-    args.output = args.input
+    args.output = args.input.name
 
 lines = args.input.readlines()
 lines2 = [x for x in lines if x.strip() != ""]
