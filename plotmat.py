@@ -300,7 +300,7 @@ class MainLoop(cmd.Cmd):
 
         datareduced = self.reduce_data(data, el[0], self.limits)
 
-        print np.mean(np.array(el[0]))
+        print np.mean(np.array(datareduced[0]))
 
     def do_quit(self, s):
         return True
