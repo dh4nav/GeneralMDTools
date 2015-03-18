@@ -7,7 +7,7 @@ import cmd
 import sys
 import matplotlib.colors as mc
 
-
+pylab.use('Agg')
 #limits = []
 datarows = []
 datareduced = []
