@@ -8,7 +8,7 @@ import numpy as np
 parser = ap.ArgumentParser(description="Generate RDF from pairs")
 parser.add_argument("-i", "--input" , help="Input File, xyz", required=True)
 parser.add_argument("-o", "--output" , help="RDF Output File", default=None, required=True)
-parser.add_argument("-p", "--pairs", help="0-based index pairs for RDF", nargs="+")
+parser.add_argument("-p", "--pairs", help="0-based index pairs for RDF", nargs="+", type=int)
 parser.add_argument("-n", "--mindist", help="minimum distance", default=0.0, type=float)
 parser.add_argument("-x", "--maxdist", help="maximum distance", type=float)
 parser.add_argument("-b", "--bins", help="number of histogram bins", type=int, default=100)
@@ -20,7 +20,13 @@ distances = []
 accumulator = 0.0
 rdf = []
 
+#print args.pairs
+#exit()
+
 for frame in xyz_iter:
+
+    #print frame
+    #exit()
 
     for n in range(0, len(args.pairs), 2):
         dist = xyzt.Dist(frame['coordinates'][args.pairs[n]], frame['coordinates'][args.pairs[n+1]], frame['boxvector'])
