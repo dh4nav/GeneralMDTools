@@ -109,7 +109,7 @@ def filter(ec, remove=None, keep=None):
 
 def Dist(x0, x1, boxvect):
     delta = np.absolute(np.subtract(x0,x1))
-    delta = np.where(delta > 0.5 * boxvect, boxvect - delta, delta)
+    delta = np.where(delta > 0.5 * boxvect[0], boxvect[0] - delta, delta)
     return np.sqrt((delta ** 2).sum(axis=-1))
 
 
