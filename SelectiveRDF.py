@@ -12,6 +12,7 @@ parser.add_argument("-p", "--pairs", help="0-based index pairs for RDF", nargs="
 parser.add_argument("-n", "--mindist", help="minimum distance", default=0.0, type=float)
 parser.add_argument("-x", "--maxdist", help="maximum distance", type=float)
 parser.add_argument("-b", "--bins", help="number of histogram bins", type=int, default=100)
+parser.add_argument("-P", "--print", help="Print frame numbers where matches occur")
 args = parser.parse_args()
 
 xyz_iter =  xyzt.GetXYZIter(args.input)
@@ -20,10 +21,11 @@ distances = []
 accumulator = 0.0
 rdf = []
 
+flag = 0
 #print args.pairs
 #exit()
 
-for frame in xyz_iter:
+for m, frame in enumerate(xyz_iter):
 
     #print frame
     #exit()
@@ -37,7 +39,12 @@ for frame in xyz_iter:
             if dist > args.maxdist:
                 continue
 
+        flag = 1
         distances.append(dist)
+    
+    if flag:
+        print m
+    flag = 0
 
 hist = np.histogram(distances, bins=args.bins)
 
@@ -45,8 +52,8 @@ for n, v in enumerate(hist[0]):
     accumulator += v
     rdf.append([hist[1][n]+((hist[1][n+1]-hist[1][n])/2.0), v, accumulator])
 
-print hist
-print rdf
+#print hist
+#print rdf
 
 opf = open(args.output, "w")
 
