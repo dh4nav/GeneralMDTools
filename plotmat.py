@@ -32,20 +32,18 @@ f_float = lambda x: float(x['x'])
 #def f_list_f(args):
 #    elements = args['x'].split(',')
 #    out_list = []
-
+#
 #    for e in elements:
 #        out_list.append(args['fa'](e.strip()))
-
+#
 #    return out_list
-
+#
 #f_list = f_list_f(args)
-
 
 #def f_list_np_f(args):
 #    return np.array(f_list(args))
-
+#
 #f_list_np = f_list_np_f(args)
-
 
 #converters = dict("bins"=(f_int, {}), "x"=(f_int, {}), "y"=(f_int, {})) #############################
 
@@ -57,7 +55,7 @@ range_keys = {}
 class MainLoop(cmd.Cmd):
 
     limits = []
-    reduced_data = []    
+    reduced_data = []
 
     def consume(self, s):
         el = s.strip().split(';')
@@ -83,7 +81,7 @@ class MainLoop(cmd.Cmd):
 
             key = e.split("=")[0].strip()
             val = e.split("=")[1].strip()
-            
+
             dict_dict[key] = eval(val)
 
             #if key in int_keys:
@@ -119,7 +117,7 @@ class MainLoop(cmd.Cmd):
         el[0] = int(el[0])
         el[1] = float(el[1])
         el[2] = float(el[2])
-    
+
         if el[2] < el[1]:
             el[2], el[1] = el[1], el[2]
 
@@ -152,7 +150,7 @@ class MainLoop(cmd.Cmd):
 
     def do_hist(self, s):
         el = self.get_this_command(s, min_args=1)
-        
+
         datareduced = self.reduce_data(data, el[0], self.limits)
 
         if len(datareduced[0]) == 0:
@@ -174,8 +172,8 @@ class MainLoop(cmd.Cmd):
 
 
         pylab.hist(datareduced[0], **arg_dict)
-            
-            
+
+
             #if len(el) > 1:
             #    print el[1].lower().strip()
             #    if el[1].lower().strip() == "log":
@@ -199,7 +197,7 @@ class MainLoop(cmd.Cmd):
     def do_rdf(self, s):
         el = self.get_this_command(s)
 
-        datareduced = self.reduce_data(data, [el[0]], self.limits)
+        datareduced = self.reduce_data(data, el[0], self.limits)
 
         bins = 100
 
@@ -218,12 +216,12 @@ class MainLoop(cmd.Cmd):
             hist_reduced.append(h / ((bins[n+1]**3) - (bins[n]**3)))
 
         bin_centers = []
-        
+
         for n in range(len(bins)-1):
             bin_centers.append(bins[n] + ((bins[n+1]-bins[n]) * 0.5))
 
         pylab.plot(bin_centers, hist_reduced)
-        
+
 
         #first_average_index = len(hist) - int(float(len(hist)) * 0.05)
         #average_counter = 0
@@ -290,7 +288,7 @@ class MainLoop(cmd.Cmd):
         #            pylab.hist2d(datareduced[0], datareduced[1], bins=bins, norm=mc.LogNorm())#, normed=True)
         #    else:
         #        pylab.hist2d(datareduced[0], datareduced[1], bins=bins, normed=True, range=[[0.0,30.0],[0.0,30.0]])
-        
+
         pylab.colorbar()
         pylab.show(block=False)
 
@@ -298,18 +296,11 @@ class MainLoop(cmd.Cmd):
 
 
     def do_average(self, s):
-        el = self.get_this_command(s)
+        el = self.get_this_command(s, min_args=1)
 
-        datareduced = self.reduce_data(data, [el[0]], self.limits)
+        datareduced = self.reduce_data(data, el[0], self.limits)
 
-        adder = 0.0
-        counter = 0.0
-
-        for d in datareduced[0]:
-            adder += d
-            counter += 1.0
-
-        print str(adder/counter)
+        print np.mean(np.array(datareduced[0]))
 
     def do_quit(self, s):
         return True
@@ -321,14 +312,13 @@ class MainLoop(cmd.Cmd):
         reduced_data = []
         for e in rows:
             reduced_data.append([])
-        
+
 
         for m, d in enumerate(alldata):
             if self.check_limits(d, limits):
                for n, r in enumerate(rows):
                    reduced_data[n].append(d[int(r)])
         return reduced_data
-
 
     def check_limits(self, data, limits):
         if len(limits):
@@ -346,13 +336,13 @@ class MainLoop(cmd.Cmd):
         global datasets
 
         el0 = self.get_this_command(s, min_args=1)
-        
+
         datasets.append([[], "", ""])
 
         current_dataset = len(datasets)-1
 
         ipf = open(el0[0][0], "r")
-        
+
         for n,l in enumerate(ipf):
             datasets[-1][0].append([n] + map(lambda x: float(x), l.strip().split()))
 
@@ -393,4 +383,3 @@ class MainLoop(cmd.Cmd):
 ML = MainLoop()
 
 ML.cmdloop()
-

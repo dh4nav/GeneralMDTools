@@ -1,4 +1,4 @@
-#!/bin/env python
+#!/usr/bin/env python!
 import argparse as ap
 
 parser = ap.ArgumentParser(description="Convert a Gaussian Input to XYZ")
