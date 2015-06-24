@@ -24,7 +24,7 @@ mode = 1
 for n, l in enumerate(ipf):
     if l.strip() == "":
         pass
-    if "ENERGY" in l:
+    elif "ENERGY" in l:
         pass
 #    elif n == 0 & mode:
 #        print mode
