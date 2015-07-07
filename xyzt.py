@@ -120,6 +120,11 @@ def DistDist(x0, x1, boxvect):
             distvect.extend(Dist(a, np.array(x1[n+1:]), np.array(boxvect)))
     return np.array(distvect)
 
+def GetDistSame(ec):
+    return ssd.pdist(ec['coordinates'])
+
+def GetDistsDiff(ec1, ec2):
+    return ssd.cdist(ec1['coordinates'],ec2['coordinates'])
 
 def Center(ec):
     center(ec)
