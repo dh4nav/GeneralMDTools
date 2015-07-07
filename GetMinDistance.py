@@ -31,7 +31,7 @@ for n, ec in enumerate(xyz_iter):
     distlist = distlist[distlist < args.distance]
 #    print distlist
     if len(distlist):
-        opf.write(str(n) + " " + str(len(distlist)/2) + "\n")
+        opf.write(str(n) + " " + str(len(distlist)/2) + " " + str(np.ndarray.min(distlist)) + "\n")
 
 
 
