@@ -6,7 +6,8 @@ import pylab
 import cmd
 import sys
 import matplotlib.colors as mc
-
+import scipy.constants as sc
+import scipy.optimize as so
 
 #limits = []
 datarows = []
@@ -47,6 +48,11 @@ f_float = lambda x: float(x['x'])
 
 #converters = dict("bins"=(f_int, {}), "x"=(f_int, {}), "y"=(f_int, {})) #############################
 
+
+def Gauss(x, A, w, xc):
+    return (A * (np.sqrt(2/sc.pi)) / (w * np.exp(2.0*((x-xc)/w)**2)))
+
+
 int_keys = {"bins":1, "x":1, "y":1}
 float_keys = {}
 tuple_keys = {}
@@ -70,6 +76,9 @@ class MainLoop(cmd.Cmd):
 
         arg_list = el[0].strip().split()[:min_args]
         dict_list = el[0].strip().split()[min_args:]
+
+        print arg_list
+        print dict_list
 
         #if len(dict_list)%2:
         #    print "Error: Additional arguments need to be supplied in pairs. Odd number of arguments found"
@@ -157,7 +166,7 @@ class MainLoop(cmd.Cmd):
             print "No Data"
             return
 
-        arg_dict = {'bins':100, 'histtype':'step', 'histtype':'step', 'normed':True}
+        arg_dict = {'bins':50, 'histtype':'step', 'normed':True}
 
         arg_dict.update(el[1])
 
@@ -188,6 +197,56 @@ class MainLoop(cmd.Cmd):
          #   pylab.hist(datareduced[0], bins=arg_dict['bins'], histtype="step", normed=True)
 
 
+
+
+        pylab.show(block=False)
+        self.consume(s)
+
+
+    def do_hist_gaussfit(self, s):
+        el = self.get_this_command(s, min_args=1)
+
+        datareduced = self.reduce_data(data, el[0], self.limits)
+
+        if 'shift' in el[1]:
+            datareduced = np.add(datareduced, float(el[1]['shift']))
+
+        bins = 50
+
+        if len(datareduced[0]) == 0:
+
+            print "No Data"
+            return
+
+        arg_dict = {'bins':50,  'normed':True}
+        #arg_dict.update(el[1])
+        hist, bins = np.histogram(datareduced[0] , **arg_dict)
+    
+        bin_centers = []
+        for n in range(len(bins)-1):
+            bin_centers.append(bins[n] + ((bins[n+1]-bins[n]) * 0.5))
+
+        pylab.plot(bin_centers, hist, 'x')
+
+        popt, pcov = so.curve_fit(Gauss, bin_centers, hist, [el[1]['A'], el[1]['w'], el[1]['xc']])
+
+        pylab.plot(bin_centers, [Gauss(x, popt[0], popt[1], popt[2]) for x in bin_centers])
+
+        print "A= " + str(popt[0])
+        print "w= " + str(popt[1])
+        print "xc= " + str(popt[2])
+
+        if 'shift' in el[1]:
+            print "Shift: " + str(el[1]['shift'])
+
+
+        print "Covariance Matrix: "
+        print pcov
+        perr =  np.sqrt(np.diag(pcov))
+
+        print "Sigma(A)= " + str(perr[0])
+        print "Sigma(w)= " + str(perr[1])
+        print "Sigma(xc)= " + str(perr[2])
 
 
         pylab.show(block=False)
