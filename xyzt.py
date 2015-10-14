@@ -227,6 +227,23 @@ def merge(eclist):
     ecout['coordinates'] = np.array(ecout['coordinates'])
     return ecout
 
+def cut_into(ec1, ec2, mindist):
+    """Return merged frames with all atoms in ec1 closer than *mindist* to any atom in ec2 removed"""
+    ecout1 = ec1.copy()
+
+    ecout1['coordinates'] = ec1['coordinates'].tolist()
+
+    dist = GetDistDiff(ec1, ec2)
+    dmin = dist.min(axis=1) 
+
+    for n in range(len(dmin)-1,-1,-1):
+        if dmin(n) < mindist:
+            del ecout1['coordinates'][n]
+            del ecout1['elements'][n]
+
+    ecout1['coordinates'] = np.array(ecout1['coordinates'])
+    return merge([ecout1, ec2])
+
 def debox_coordinate(ref, val, box):
     """Return minum image convention distance between ref and var with box size *box*"""
     if (ref - val) > (box/2.0):
