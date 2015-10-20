@@ -5,7 +5,7 @@ import scipy.spatial.distance as ssd
 
 
 class GetXYZIter:
-    """XYZ Iterator class 
+    """XYZ Iterator class
 
     Frame format specification:
         {'elements':[str, ...], 'coordinates':ndarray([[x,y,z],...]), 'boxvector':float, 'framenumber':int, 'filename':str}"""
@@ -71,25 +71,67 @@ def get_extreme_value(vectors):
     """Return maximum of absolute of flattened vectors"""
     return np.absolute(vectors.flatten()).max()
 
-def rotate_single_vector_around_origin(vector, angle_x, angle_y, angle_z):
+def rotate_single_vector_around_origin(vector, angle_x, angle_y, angle_z, degrees=False):
     """Return vector rotated around origin by 3 angles"""
-    return np.array([
-        (vector[0] * np.cos(angle_y) * np.cos(angle_z))
-            + (vector[1] * ( (np.cos(angle_x) * np.sin(angle_z) ) + ( np.sin(angle_x) * np.sin(angle_y) * np.cos(angle_z) ) ))
-            + (vector[2] * ( (np.sin(angle_x) * np.sin(angle_z) ) - ( np.cos(angle_x) * np.sin(angle_y) * np.cos(angle_z) ) )) ,
 
-        ( vector[0] * (-1.0 * np.cos(angle_y)) * np.sin(angle_z) )
-            #+ (vector[1] * ( (np.cos(angle_x) * np.cos(angle_z) ) - ( np.sin(angle_x) * np.sin(angle_y) + np.sin(angle_z) ) ))
-            + (vector[2] * ( (np.sin(angle_x) * np.cos(angle_z) ) + ( np.cos(angle_x) * np.sin(angle_y) + np.sin(angle_z) ) )) ,
+    if degrees:
+        angle_x = angle_x * (np.pi / 180.0)
+        angle_y = angle_y * (np.pi / 180.0)
+        angle_z = angle_z * (np.pi / 180.0)
 
-        (vector[0] * np.sin(angle_y) )
-            + (vector[1] * (-1.0 * np.sin(angle_x)) * np.cos(angle_y))
-            + (vector[2] * np.cos(angle_x) * np.cos(angle_y))])
+    print angle_x
+    print angle_y
+    print angle_z
+
+    print np.cos(angle_x)
+    print np.sin(angle_x)
+
+    outvector = [0.0,0.0,0.0]
+    v1 = [0.0,0.0,0.0]
+    v2 = [0.0,0.0,0.0]
+
+    v1[0] = vector[0]
+    v1[1] = (vector[1] * np.cos(angle_x)) + (vector[2] * np.sin(angle_x))
+    v1[2] = (vector[1] * np.sin(angle_x) * -1.0) + (vector[2] * np.cos(angle_x))
+
+
+    v2[0] = (v1[0] * np.cos(angle_y)) - (v1[2] * np.sin(angle_y))
+    v2[1] = v1[1]
+    v2[2] = (v1[0] * np.sin(angle_y)) + (v1[2] * np.cos(angle_y))
+
+    outvector[0] = (v2[0] * np.cos(angle_z)) - (v2[1] * np.sin(angle_z))
+    outvector[1] = (v2[0] * np.sin(angle_z)) + (v2[1] * np.cos(angle_z))
+    outvector[2] = v2[2]
+
+    print vector
+    print v1
+    print v2
+    print outvector
+    print "---"
+
+    return outvector
+
+    # return np.array([
+    #     (vector[0] * np.cos(angle_y) * np.cos(angle_z))
+    #         + (vector[1] * ( (np.cos(angle_x) * np.sin(angle_z) ) + ( np.sin(angle_x) * np.sin(angle_y) * np.cos(angle_z) ) ))
+    #         + (vector[2] * ( (np.sin(angle_x) * np.sin(angle_z) ) - ( np.cos(angle_x) * np.sin(angle_y) * np.cos(angle_z) ) )) ,
+    #
+    #     ( vector[0] * (-1.0 * np.cos(angle_y)) * np.sin(angle_z) )
+    #         + (vector[1] * ( (np.cos(angle_x) * np.cos(angle_z) ) - ( np.sin(angle_x) * np.sin(angle_y) + np.sin(angle_z) ) ))
+    #         + (vector[2] * ( (np.sin(angle_x) * np.cos(angle_z) ) + ( np.cos(angle_x) * np.sin(angle_y) + np.sin(angle_z) ) )) ,
+    #
+    #     (vector[0] * np.sin(angle_y) )
+    #         + (vector[1] * (-1.0 * np.sin(angle_x)) * np.cos(angle_y))
+    #         + (vector[2] * np.cos(angle_x) * np.cos(angle_y))])
 
 def rotate_around_origin(ec, angle_x, angle_y, angle_z):
     """Return all vectors in frame rotated around origin by 3 vectors"""
-    ec['coordinates'] = rotate_single_vector_around_origin(ec['coordinates'], angle_x * (np.pi / 180.0), angle_y * (np.pi / 180.0), angle_z* (np.pi / 180.0))
-    return ec
+    ecout = ec.copy()
+    rotcoords = []
+    for co in ecout['coordinates']:
+        rotcoords.append(rotate_single_vector_around_origin(co, angle_x * (np.pi / 180.0), angle_y * (np.pi / 180.0), angle_z* (np.pi / 180.0)))
+    ecout['coordinates'] = np.array(rotcoords)
+    return ecout
 
 def Filter(ec, remove=None, keep=None):
     """**DEPRECATED** Alias method for filter"""
@@ -233,11 +275,11 @@ def cut_into(ec1, ec2, mindist):
 
     ecout1['coordinates'] = ec1['coordinates'].tolist()
 
-    dist = GetDistDiff(ec1, ec2)
-    dmin = dist.min(axis=1) 
+    dist = GetDistsDiff(ec1, ec2)
+    dmin = dist.min(axis=1)
 
     for n in range(len(dmin)-1,-1,-1):
-        if dmin(n) < mindist:
+        if dmin[n] < mindist:
             del ecout1['coordinates'][n]
             del ecout1['elements'][n]
 
