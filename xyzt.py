@@ -79,13 +79,6 @@ def rotate_single_vector_around_origin(vector, angle_x, angle_y, angle_z, degree
         angle_y = angle_y * (np.pi / 180.0)
         angle_z = angle_z * (np.pi / 180.0)
 
-    print angle_x
-    print angle_y
-    print angle_z
-
-    print np.cos(angle_x)
-    print np.sin(angle_x)
-
     outvector = [0.0,0.0,0.0]
     v1 = [0.0,0.0,0.0]
     v2 = [0.0,0.0,0.0]
@@ -103,12 +96,6 @@ def rotate_single_vector_around_origin(vector, angle_x, angle_y, angle_z, degree
     outvector[1] = (v2[0] * np.sin(angle_z)) + (v2[1] * np.cos(angle_z))
     outvector[2] = v2[2]
 
-    print vector
-    print v1
-    print v2
-    print outvector
-    print "---"
-
     return outvector
 
     # return np.array([
@@ -124,12 +111,17 @@ def rotate_single_vector_around_origin(vector, angle_x, angle_y, angle_z, degree
     #         + (vector[1] * (-1.0 * np.sin(angle_x)) * np.cos(angle_y))
     #         + (vector[2] * np.cos(angle_x) * np.cos(angle_y))])
 
-def rotate_around_origin(ec, angle_x, angle_y, angle_z):
+def rotate_around_origin(ec, angle_x, angle_y, angle_z, degrees=False):
     """Return all vectors in frame rotated around origin by 3 vectors"""
     ecout = ec.copy()
     rotcoords = []
+    if degrees:
+        angle_x = angle_x * (np.pi / 180.0)
+        angle_y = angle_y * (np.pi / 180.0)
+        angle_z = angle_z * (np.pi / 180.0)
+
     for co in ecout['coordinates']:
-        rotcoords.append(rotate_single_vector_around_origin(co, angle_x * (np.pi / 180.0), angle_y * (np.pi / 180.0), angle_z* (np.pi / 180.0)))
+        rotcoords.append(rotate_single_vector_around_origin(co, angle_x, angle_y, angle_z))
     ecout['coordinates'] = np.array(rotcoords)
     return ecout
 
