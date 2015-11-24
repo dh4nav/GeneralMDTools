@@ -313,10 +313,14 @@ def debox_intramolecule(ec, box):
     ecout['coordinates'] = np.array(newcoordinates)
     return ecout
 
-def debox_intermolecule(eclist, box, center_on=0):
+def debox_intermolecule(eclist, box, center_on=None, center_on_coordinates=None):
     """Return frame with atoms placed at minimum image convention positions, with atom *center_on* used as reference, for box diameter *box*"""
-    if center_on < 0:
-        center_on = len(eclist['coordinates']) + center_on
+    centerref = None
+    
+    if center_on:
+        centerref = get_center_of_mass(eclist[len(eclist['coordinates']) + center_on])
+    elif center_on_coordinates:
+        centerref = center_on_coordinates 
 
     centerref = get_center_of_mass(eclist[center_on])
 
