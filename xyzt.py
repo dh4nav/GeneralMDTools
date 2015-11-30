@@ -317,9 +317,9 @@ def debox_intermolecule(eclist, box, center_on=None, center_on_coordinates=None)
     """Return frame with atoms placed at minimum image convention positions, with atom *center_on* used as reference, for box diameter *box*"""
     centerref = None
     
-    if center_on:
+    if center_on != None:
         centerref = get_center_of_mass(eclist[center_on])
-    elif center_on_coordinates:
+    elif center_on_coordinates != None:
         centerref = center_on_coordinates 
 
     #centerref = get_center_of_mass(eclist[center_on])
