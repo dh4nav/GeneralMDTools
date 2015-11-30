@@ -318,11 +318,11 @@ def debox_intermolecule(eclist, box, center_on=None, center_on_coordinates=None)
     centerref = None
     
     if center_on:
-        centerref = get_center_of_mass(eclist[len(eclist['coordinates']) + center_on])
+        centerref = get_center_of_mass(eclist[center_on])
     elif center_on_coordinates:
         centerref = center_on_coordinates 
 
-    centerref = get_center_of_mass(eclist[center_on])
+    #centerref = get_center_of_mass(eclist[center_on])
 
     ecoutlist = []
 
