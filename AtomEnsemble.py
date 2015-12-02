@@ -112,8 +112,11 @@ class AtomEnsemble(col.MutableSequence):
         elif type(num) == dict:
             for k in val:
                 self.main_list[a][k] = val[k]
+        elif type(num) == Atom:
+            for k in val:
+                self.main_list[a][k] = val[k]
         else:
-            raise TypeError("Supported key types: int, str, dict")
+            raise TypeError("Supported key types: int, str, dict, Atom")
 
     def append(self, obj):
         self.main_list.append(obj)
@@ -132,20 +135,24 @@ class AtomEnsemble(col.MutableSequence):
             self.main_list.extend(obj.main_list)
         elif type(obj) == list:
             self.main_list.extend(obj)
-        elif type(obj) == dict:
+        elif type(obj) == Atom:
             self.main_list.append(obj)
+        elif type(obj) == dict:
+            self.main_list.append(Atom(**obj))
         else:
-            raise TypeError("Supported types: AtomEnsemble, list, dict")
+            raise TypeError("Supported types: AtomEnsemble, list, dict, Atom")
 
     def __add__(self, obj):
         if type(obj) == AtomEnsemble:
             return self.copy().main_list.extend(obj.main_list)
         elif type(obj) == list:
             return self.copy().main_list.extend(obj)
-        elif type(obj) == dict:
+        elif type(obj) == Atom:
             return self.copy().main_list.append(obj)
+        elif type(obj) == dict:
+            return self.copy().main_list.append(Atom(**obj))
         else:
-            raise TypeError("Supported types: AtomEnsemble, list, dict")
+            raise TypeError("Supported types: AtomEnsemble, list, dict, Atom")
 
     def __imul__(self, val):
         self.main_list = self.main_list * val
