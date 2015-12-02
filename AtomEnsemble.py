@@ -9,7 +9,7 @@ class Atom(col.MutableMapping):
     def __init__(self, **kwargs):
         self.store = {"element": None, "coordinate": None, "velocity": None, "force": None, "mass": 1.0, "charge": 0.0, "molecule_index": 0}
         self.nplist = ["coordinate", "velocity", "force"]
-        for key in kwarg:
+        for key in kwargs:
             self.__setitem__(key, kwargs[key])
 
     def __getitem__(self, key):
