@@ -97,14 +97,14 @@ try:
                 force = l.strip()
 
             if (tscounter % (typekey +2)) == (typekey+1):
-                if args.charge:
-                    opf.write(pos + " " + vel + " " + force + " " + mass + " " + charge + "\n")
-                elif args.mass:
-                    opf.write(pos + " " + vel + " " + force + " " + mass + "\n")
-                elif args.force:
-                    opf.write(pos + " " + vel + " " + force + "\n")
+                if args.force:
+                    opf.write(pos + " " + mass + " " + charge + " " + vel + " " + force + "\n")
                 elif args.velocity:
-                    opf.write(pos + " " + vel + "\n")
+                    opf.write(pos + " " + mass + " " + charge + " " + vel "\n")
+                elif args.charge:
+                    opf.write(pos + " " + mass + " " + charge + "\n")
+                elif args.mass:
+                    opf.write(pos + " " + mass + "\n")
 
         tscounter += 1
         globallinenum = n
