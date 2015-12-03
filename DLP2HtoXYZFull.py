@@ -60,7 +60,7 @@ lastelement = ""
 framecounter = 0
 
 inf = open(args.history, "r")
-opf = open(args.xyz + ".xyz", "w")
+opf = open(args.xyz, "w")
 try:
     for n,l in enumerate(inf):
 
