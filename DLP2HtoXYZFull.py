@@ -100,7 +100,7 @@ try:
                 if args.force:
                     opf.write(pos + " " + mass + " " + charge + " " + vel + " " + force + "\n")
                 elif args.velocity:
-                    opf.write(pos + " " + mass + " " + charge + " " + vel "\n")
+                    opf.write(pos + " " + mass + " " + charge + " " + vel + "\n")
                 elif args.charge:
                     opf.write(pos + " " + mass + " " + charge + "\n")
                 elif args.mass:
