@@ -98,13 +98,13 @@ try:
 
             if (tscounter % (typekey +2)) == (typekey+1):
                 if args.force:
-                    opf.write(pos + " " + mass + " " + charge + " " + vel + " " + force + "\n")
+                    opf.write(element + " " + pos + " " + mass + " " + charge + " " + vel + " " + force + "\n")
                 elif args.velocity:
-                    opf.write(pos + " " + mass + " " + charge + " " + vel + "\n")
+                    opf.write(element + " " + pos + " " + mass + " " + charge + " " + vel + "\n")
                 elif args.charge:
-                    opf.write(pos + " " + mass + " " + charge + "\n")
+                    opf.write(element + " " + pos + " " + mass + " " + charge + "\n")
                 elif args.mass:
-                    opf.write(pos + " " + mass + "\n")
+                    opf.write(element + " " + pos + " " + mass + "\n")
 
         tscounter += 1
         globallinenum = n
