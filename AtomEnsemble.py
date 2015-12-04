@@ -143,14 +143,25 @@ class AtomEnsemble(col.MutableSequence):
             raise TypeError("Supported types: AtomEnsemble, list, dict, Atom")
 
     def __add__(self, obj):
+        #print obj
+        #print self
+        oa = self.copy()
         if type(obj) == AtomEnsemble:
-            return self.copy().main_list.extend(obj.main_list)
+            oa.main_list.extend(obj.main_list)
+            return oa
+            #return self.copy().main_list.extend(obj.main_list)
         elif type(obj) == list:
-            return self.copy().main_list.extend(obj)
+            oa.main_list.extend(obj)
+            return oa
+            #return self.copy().main_list.extend(obj)
         elif type(obj) == Atom:
-            return self.copy().main_list.append(obj)
+            oa.main_list.append(obj)
+            return oa
+            #return self.copy().main_list.append(obj)
         elif type(obj) == dict:
-            return self.copy().main_list.append(Atom(**obj))
+            oa.main_list.append(Atom(**obj))
+            return oa
+            #return self.copy().main_list.append(Atom(**obj))
         else:
             raise TypeError("Supported types: AtomEnsemble, list, dict, Atom")
 

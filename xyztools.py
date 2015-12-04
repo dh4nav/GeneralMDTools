@@ -34,7 +34,7 @@ class XYZReader(object):
                             self.intraframepos = 0
                             self.framepos += 1
 
-                        self.frameindex[str(self.framepos)] = self.filehandle.tell()
+                        self.frameindex[str(self.framepos)] = self.fileindex.tell()
 
                         while self.framepos < framenum:
                             self.framelength = int(self.filehandle().strip()) +2
@@ -44,7 +44,7 @@ class XYZReader(object):
                                 self.intraframepos += 1
                             self.intraframepos = 0
                             self.framepos += 1
-                            self.frameindex[str(self.framepos)] = self.filehandle.tell()
+                            self.frameindex[str(self.framepos)] = self.fileindex.tell()
 
         ensemble = ae.AtomEnsemble()
         ensemble.filename = self.filehandle.name
@@ -58,16 +58,15 @@ class XYZReader(object):
             elements = self.filehandle.readline().strip().split()
             atomproperties['element'] = elements[0]
             atomproperties['coordinate'] = [float(elements[1]), float(elements[2]), float(elements[3])]
-            if len(elements) > 3:
-                atomproperties['mass'] = float(elements[4])
             if len(elements) > 4:
+                atomproperties['mass'] = float(elements[4])
+            if len(elements) > 5:
                 atomproperties['charge'] = float(elements[5])
-            if len(elements) > 7:
+            if len(elements) > 8:
                 atomproperties['velocity'] = [float(elements[6]), float(elements[7]), float(elements[8])]
-            if len(elements) > 10:
-                atomproperties['force'] = [float(elements[9]), float(elements[10]), float(elements[11])]
-
             if len(elements) > 11:
+                atomproperties['force'] = [float(elements[9]), float(elements[10]), float(elements[11])]
+            if len(elements) > 12:
                 atomproperties['molecule_index'] = int(elements[12])
 
             ensemble.append(ae.Atom(**atomproperties))
