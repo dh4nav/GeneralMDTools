@@ -2,10 +2,47 @@ import collections as col
 import copy
 import numpy as np
 
-class AtomEnsemble(col.Iterable, col.MutableSequence):
+class Atom(col.MutableMapping):
+    """A dictionary that applies an arbitrary key-altering
+       function before accessing the keys"""
+
+    def __init__(self, **kwargs):
+        self.store = {"element": None, "coordinate": None, "velocity": None, "force": None, "mass": 1.0, "charge": 0.0, "molecule_index": 0}
+        self.nplist = ["coordinate", "velocity", "force"]
+        for key in kwargs:
+            self.__setitem__(key, kwargs[key])
+
+    def __getitem__(self, key):
+        return self.store[key]
+
+    def __setitem__(self, key, value):
+        if key in self.nplist:
+            value = np.array(value)
+        self.store[key] = value
+
+    def __delitem__(self, key):
+        del self.store[key]
+
+    def __iter__(self):
+        return iter(self.store)
+
+    def __len__(self):
+        return len(self.store)
+
+    def __str__(self):
+        return self.store.__str__()
+
+    def copy(self):
+        return copy.deepcopy(self)
+
+
+class AtomEnsemble(col.MutableSequence):
 
     def __init__(self):
         self.main_list = []
+        self.boxvector = 0.0
+        self.filename = ""
+        self.framenumber = 0
 
     def __iter__(self):
         return self.main_list.__iter__()
@@ -72,8 +109,14 @@ class AtomEnsemble(col.Iterable, col.MutableSequence):
                 self.main_list[a][num] = val
         elif type(num) == int:
             self.main_list[num] = val
+        elif type(num) == dict:
+            for k in val:
+                self.main_list[a][k] = val[k]
+        elif type(num) == Atom:
+            for k in val:
+                self.main_list[a][k] = val[k]
         else:
-            raise TypeError("Supported key types: int, str")
+            raise TypeError("Supported key types: int, str, dict, Atom")
 
     def append(self, obj):
         self.main_list.append(obj)
@@ -92,20 +135,35 @@ class AtomEnsemble(col.Iterable, col.MutableSequence):
             self.main_list.extend(obj.main_list)
         elif type(obj) == list:
             self.main_list.extend(obj)
-        elif type(obj) == dict:
+        elif type(obj) == Atom:
             self.main_list.append(obj)
+        elif type(obj) == dict:
+            self.main_list.append(Atom(**obj))
         else:
-            raise TypeError("Supported types: AtomEnsemble, list, dict")
+            raise TypeError("Supported types: AtomEnsemble, list, dict, Atom")
 
     def __add__(self, obj):
+        #print obj
+        #print self
+        oa = self.copy()
         if type(obj) == AtomEnsemble:
-            return self.copy().main_list.extend(obj.main_list)
+            oa.main_list.extend(obj.main_list)
+            return oa
+            #return self.copy().main_list.extend(obj.main_list)
         elif type(obj) == list:
-            return self.copy().main_list.extend(obj)
+            oa.main_list.extend(obj)
+            return oa
+            #return self.copy().main_list.extend(obj)
+        elif type(obj) == Atom:
+            oa.main_list.append(obj)
+            return oa
+            #return self.copy().main_list.append(obj)
         elif type(obj) == dict:
-            return self.copy().main_list.append(obj)
+            oa.main_list.append(Atom(**obj))
+            return oa
+            #return self.copy().main_list.append(Atom(**obj))
         else:
-            raise TypeError("Supported types: AtomEnsemble, list, dict")
+            raise TypeError("Supported types: AtomEnsemble, list, dict, Atom")
 
     def __imul__(self, val):
         self.main_list = self.main_list * val
@@ -115,7 +173,7 @@ class AtomEnsemble(col.Iterable, col.MutableSequence):
 
     def __str__(self):
         outstring = ""
-        [outstring = outstring + str(i) + "\n" for i in self.main_list]
+        outstring += " ".join([str(i) + "\n" for i in self.main_list])
         return outstring
 
-    def shift_all(coords):
+#    def shift_all(coords):
