@@ -61,9 +61,9 @@ framecounter = 0
 
 inf = open(args.history, "r")
 opf = open(args.xyz, "w")
+
 try:
     for n,l in enumerate(inf):
-
         if l.find("timestep") != -1:
             if args.verbose:
                 framecounter += 1
@@ -76,27 +76,27 @@ try:
             if boxkey != 0:
                 numlines += 3
             tscounter = 0
-            opf.write(l.split()[2].strip()+"\n")
+            opf.write(l.split()[2].strip() + "\n")
 
         elif (boxkey > 0) and (tscounter < 4):
             if tscounter == 1:
-                opf.write( l.split()[0].strip()+"\n")
+                opf.write( l.split()[0].strip() + "\n")
 
         elif tscounter <= numlines:
-            if(tscounter % (typekey +2)) == 0:
+            if(tscounter % (typekey + 2)) == 0:
                 element = l.split()[0].strip()
                 mass = l.split()[2].strip()
                 charge = l.split()[3].strip()
                 vel = "0.0, 0.0, 0.0"
                 force = "0.0, 0.0, 0.0"
-            elif(tscounter % (typekey +2)) == 1:
+            elif(tscounter % (typekey + 2)) == 1:
                 pos = l.strip()
-            elif(tscounter % (typekey +2)) == 2:
+            elif(tscounter % (typekey + 2)) == 2:
                 vel = l.strip()
-            elif(tscounter % (typekey +2)) == 3:
+            elif(tscounter % (typekey + 2)) == 3:
                 force = l.strip()
 
-            if (tscounter % (typekey +2)) == (typekey+1):
+            if (tscounter % (typekey + 2)) == (typekey + 1):
                 if args.force:
                     opf.write(element + " " + pos + " " + mass + " " + charge + " " + vel + " " + force + "\n")
                 elif args.velocity:

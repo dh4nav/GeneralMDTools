@@ -59,11 +59,14 @@ class AtomEnsemble(col.MutableSequence):
         else:
             raise TypeError("Supported key types: int, str")
 
-    def __getitem__(self, num):
+        return self
+
+    def get_pure_list(self, num):
         if type(num) == str:
             return [v for a in range(len(self.main_list)) for k, v in self.main_list[a].items() if k is num ]
         elif type(num) == int:
-            return self.main_list[num]
+            self.main_list = self.main_list[num]
+            return self.main_list
         elif type(num) == slice:
 
             return self.main_list[num]
@@ -86,11 +89,11 @@ class AtomEnsemble(col.MutableSequence):
     #     else:
     #         raise TypeError("Supported key types: int, str, slice, list")
 
-    def __mod__(self, num):
+    def __getitem__(self, num):
         """Get rich copy"""
         rt = self.copy()
-        #if type(num) == str:
-        #    return [v for a in range(len(self.main_list)) for k, v in self.main_list[a].items() if k is num ]
+        if type(num) == str:
+            return [v for a in range(len(self.main_list)) for k, v in self.main_list[a].items() if k is num ]
         if type(num) == int:
             rt.main_list = rt.main_list[num]
             return rt
@@ -101,7 +104,9 @@ class AtomEnsemble(col.MutableSequence):
             rt.main_list = [rt.__getitem__(a) for a in num]
             return rt
         else:
-            raise TypeError("Supported key types: int, slice, list")
+            raise TypeError("Supported key types: int, str, slice, list")
+
+        return self
 
     def __setitem__(self, num, val):
         if type(num) == str:
@@ -118,14 +123,19 @@ class AtomEnsemble(col.MutableSequence):
         else:
             raise TypeError("Supported key types: int, str, dict, Atom")
 
+        return self
+
     def append(self, obj):
         self.main_list.append(obj)
+        return self
 
     def extend(self, obj):
         self.main_list.extend(obj)
+        return self
 
     def insert(self, idx, obj):
         self.main_list.insert(idx, obj)
+        return self
 
     def copy(self):
         return copy.deepcopy(self)
@@ -141,6 +151,8 @@ class AtomEnsemble(col.MutableSequence):
             self.main_list.append(Atom(**obj))
         else:
             raise TypeError("Supported types: AtomEnsemble, list, dict, Atom")
+
+        return self
 
     def __add__(self, obj):
         #print obj
@@ -165,15 +177,98 @@ class AtomEnsemble(col.MutableSequence):
         else:
             raise TypeError("Supported types: AtomEnsemble, list, dict, Atom")
 
+    def __radd__(self, obj):
+        #print obj
+        #print self
+        oa = self.copy()
+        if type(obj) == AtomEnsemble:
+            oa.main_list.insert(0, obj.main_list)
+            return oa
+            #return self.copy().main_list.extend(obj.main_list)
+        elif type(obj) == list:
+            print "."
+            print oa
+            print ".."
+            print oa.main_list
+            print "..."
+            oa.main_list.reverse()
+            print oa.main_list
+            print "...."
+            obj.main_list.reverse()
+            oa.main_list.append(obj.main_list)
+            oa.main_list.reverse()
+            print oa.main_list
+            #reverse(reverse(oa.main_list).append(reverse(obj.main_list)))
+            #oa.main_list.insert(0, obj)
+            return oa
+            #return self.copy().main_list.extend(obj)
+        elif type(obj) == Atom:
+            oa.main_list.insert(0, obj)
+            return oa
+            #return self.copy().main_list.append(obj)
+        elif type(obj) == dict:
+            oa.main_list.insert(0, Atom(**obj))
+            return oa
+            #return self.copy().main_list.append(Atom(**obj))
+        else:
+            raise TypeError("Supported types: AtomEnsemble, list, dict, Atom")
+
     def __imul__(self, val):
         self.main_list = self.main_list * val
+        return self
 
     def __mul__(self, val):
-        return self.main_list * val
+        print "m"
+        cp = self.copy()
+        cp.main_list = cp.main_list * val
+        return cp
 
     def __str__(self):
         outstring = ""
         outstring += " ".join([str(i) + "\n" for i in self.main_list])
         return outstring
+
+    def filter(self, keep=None, remove=None):
+        cp = self.copy()
+
+        counter = 0
+        while counter < len(cp.main_list):
+            if remove:
+                if cp.main_list[counter]['element'] in remove:
+                    del cp.main_list[counter]
+                    counter -= 1
+            elif keep:
+                if cp.main_list[counter]['element'] not in keep:
+                    del cp.main_list[counter]
+                    counter -= 1
+            counter += 1
+
+        return cp
+
+    def alter_property(self, value, range=None, property="coordinates"):
+        property_type = list()
+        value_type = list()
+
+        flag = True
+        while flag:
+            try:
+                property_type.append(self.main_list[0][property])
+            except:
+                flag = False
+
+
+        flag = True
+        while flag:
+            try:
+                value_type.append(value)
+            except:
+                flag = False
+
+
+
+    # def center(self, center_index=None, center_coordinates=None):
+    #         if center_index != None:
+
+
 
 #    def shift_all(coords):
