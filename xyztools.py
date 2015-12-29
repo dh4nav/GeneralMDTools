@@ -241,3 +241,39 @@ class DLP2HReader(Reader):
                     atomproperties = dict()
 
             return ensemble
+
+class Writer(object):
+
+    def __init__(self, fileobj=None, overwrite=False):
+        if type(fileobj) == str:
+            if overwrite:
+                self.filehandle = open(fileobj, "w")
+            else:
+                self.filehandle = open(fileobj, "a")
+        elif type(fileobj) == file:
+            self.filehandle = fileobj
+
+    def __del__(self):
+        if self.filehandle:
+            self.filehandle.close()
+
+    def write(self, frame=None, preamble=True):
+        if frame:
+            if type(frame) is list:
+                self.write(frame=frame[0])
+                for f in frame[1:]:
+                    self.write(f, preamble=False)
+
+            if preamble:
+                self._write_global_preamble(frame)
+            self._write_frame_preamble(frame)
+            self._write_main(frame)
+
+    def _write_global_preamble(self, frame=None):
+        pass
+
+    def _write_frame_preamble(self, frame=None):
+        pass
+
+    def _write_main(self, frame=None):
+        pass
