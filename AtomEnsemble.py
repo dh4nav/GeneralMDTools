@@ -43,6 +43,7 @@ class AtomEnsemble(col.MutableSequence):
         self.boxvector = 0.0
         self.filename = ""
         self.framenumber = 0
+        self.header = ""
 
     def __iter__(self):
         return self.main_list.__iter__()
