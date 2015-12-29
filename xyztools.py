@@ -277,3 +277,56 @@ class Writer(object):
 
     def _write_main(self, frame=None):
         pass
+
+class XYZWriter(Writer):
+
+    def _write_global_preamble(self, frame=None):
+        pass
+
+    def _write_frame_preamble(self, frame=None):
+        self.filehandle.write(str(len(frame['element'])) + "\n")
+        self.filehandle.write(str(frame.boxvector) + "\n")
+
+    def _write_main(self, frame=None):
+        for i in xrange(len(frame['element'])):
+            self.filehandle.write(frame['element'][i])
+            self.filehandle.write(" " + str(frame['coordinate'][i][0]) + " " + str(frame['coordinate'][i][1]) + " " + str(frame['coordinate'][i][2]))
+            if 'mass' in frame:
+                self.filehandle.write(" " + str(frame['mass'][i]))
+            else:
+                self.filehandle.write("\n")
+                continue
+
+            if 'charge' in frame:
+                self.filehandle.write(" " + str(frame['charge'][i]))
+            else:
+                self.filehandle.write("\n")
+                continue
+
+            if 'velocity' in frame:
+                self.filehandle.write" " + str(frame['velocity'][i][0]) + " " + str(frame['velocity'][i][1]) + " " + str(frame['velocity'][i][2]))
+            else:
+                self.filehandle.write("\n")
+                continue
+
+            if 'force' in frame:
+                self.filehandle.write(" " + str(frame['force'][i][0]) + " " + str(frame['force'][i][1]) + " " + str(frame['force'][i][2]))
+            else:
+                self.filehandle.write("\n")
+                continue
+
+            if 'molecule_index' in frame:
+                self.filehandle.write(" " + str(frame['molecule_index'][i]))
+
+            self.filehandle.write("\n")
+
+class DLP2CWriter(Writer):
+
+    def _write_global_preamble(self, frame=None):
+        pass
+
+    def _write_frame_preamble(self, frame=None):
+        pass
+
+    def _write_main(self, frame=None):
+        pass
