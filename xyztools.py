@@ -1,5 +1,127 @@
 import AtomEnsemble as ae
 
+class Reader(object):
+    def __str__(self):
+        ost = "framepos: " + str(self.framepos) + "\nframelength: " + str(self.framelength) + "\nFrameindex: " + str(self.frameindex)
+        return ost
+
+
+    def __init__(self, fileobj=None):
+        if type(fileobj) == str:
+            self.filehandle = open(fileobj)
+        elif type(fileobj) == file:
+            self.filehandle = fileobj
+
+        self.framepos = 0
+        self.intraframepos = 0
+        self.framelength = 0
+        self.frameindex = {0: 0}
+        self.frameindex_complete = False
+
+    def _get_next_frame_start(self, seek=None, frame_length=None, preamble_length=None, marker=None):
+
+        #throw exception if neither marker nor frame_length are specified
+        if (marker is None) and (frame_length is None):
+            raise ValueError("Missing required arguments: Either marker or frame_length required")
+
+        #seek if specified
+        if seek != None:
+            self.filehandle.seek(seek)
+
+        #skip preamble if specified
+        if self.filehandle.tell() = 0:
+            if preamble_length != None:
+                for i in xrange(preamble_length):
+                    self.filehandle.readline()
+
+        #read frame_length lines if specified and return position
+        if frame_length != None:
+            for i in xrange(frame_length):
+                self.filehandle.readline()
+            return self.filehandle.tell()
+
+        #else read until marker occurs, return tell from line prior
+        elif marker != None:
+            line = ""
+            last_tell = self.filehandle.tell()
+            while marker not in line:
+                line = self.filehandle.readline()
+                last_tell = self.filehandle.tell()
+            return last_tell
+
+    def _read_preamble(self):
+        # implement read preamble here
+        return Null
+
+    def _get_frame_length(self):
+        # implement get frame length here
+        return Null
+
+    def _get_frame(self, seek=None, frame_length=None, marker=None):
+
+        #seek if specified
+        if seek != None:
+            self.filehandle.seek(seek)
+
+        #read frame_length lines if specified and return position
+        if frame_length != None:
+            for i in xrange(frame_length):
+                self.filehandle.readline()
+                # parser code here
+
+        #else read until marker occurs, return tell from line prior
+        elif marker != None:
+            line = ""
+            while marker not in line:
+                line = self.filehandle.readline()
+                # parser code here
+
+    def __getitem__(self, framenum=None):
+        print "fn" + str(framenum)
+        print self.frameindex
+
+        #deal with slices
+        if type(framenum) = slice:
+            collector = []
+            for i in range(slice):
+                collector.append(self.__getitem__(framenum=i))
+            return collector
+
+        #get frame length if unknown
+        if self.framelength == 0:
+            self.framelength = self._get_frame_length()
+
+        #frame known and positive
+        if framenum in frameindex:
+            return self.get_frame(seek=self.frameindex[framenum], frame_length=self.framelength)
+
+        #frame unknown and positive
+        elif framenum > -1:
+            for i in xrange(framenum+1):
+                if i == framenum:
+                    return self.get_frame(seek=self.frameindex[framenum], frame_length=self.framelength)
+                elif i in self.frameindex:
+                    pass
+                else:
+                    self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length = self.framelength)
+
+        #frame negative
+        elif framenum < 0:
+            #last frame unknown
+            if self.frameindex_complete == False:
+                i = 0
+                try:
+                    while True:
+                        if i in self.frameindex:
+                            pass
+                        else:
+                            self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length = self.framelength)
+                        i += 1
+                except:
+                    self.frameindex_complete = True
+            #last frame known
+            return self.get_frame(seek=self.frameindex[len(self.frameindex) - framenum], frame_length=self.framelength)
+
 class XYZReader(object):
 
     def __str__(self):
