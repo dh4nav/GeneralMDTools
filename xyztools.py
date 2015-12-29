@@ -208,6 +208,7 @@ class DLP2HReader(Reader):
 
             ensemble.filename = self.filehandle.name
             ensemble.framenumber = frame_number
+            ensemble.header = self.header
 
             atoms_start = 1
             if self.periodic_key > 0:
@@ -223,7 +224,7 @@ class DLP2HReader(Reader):
                     ensemble.time = float(elements[5])
                     if elements[0].strip() is not "timestep":
                         raise SyntaxError("Word timestep not found. Frame:" + str(frame_number) + ", Line:" + str(i))
-                elif self.periodic_key and (i == 1):
+                elif self.periodic_key and (i == 2):
                     ensemble.boxvector = float(elements[0])
                 elif atom_position == 0:
                     atomproperties['element'] = elements[0]
@@ -288,7 +289,7 @@ class XYZWriter(Writer):
         if frame.boxvector:
             self.filehandle.write(str(frame.boxvector) + "\n")
         else:
-            self.filehandle.write("\n")
+            self.filehandle.write(frame.header + "\n")
 
     def _write_main(self, frame=None):
         for i in xrange(len(frame['element'])):
@@ -329,7 +330,33 @@ class DLP2CWriter(Writer):
         pass
 
     def _write_frame_preamble(self, frame=None):
-        pass
+        self.filehandle.write(frame.header + "\n")
+        if 'force' in frame:
+            self.filehandle.write("      2   ")
+        elif 'velocity' in frame:
+            self.filehandle.write("      1   ")
+        else:
+            self.filehandle.write("      0   ")
+
+        if frame.boxvector:
+            self.filehandle.write("      3   ")
+        else:
+            self.filehandle.write("      0   ")
+
+        self.filehandle.write("{10d}{20.12f}\n".format(len(frame['element']), 0.0))
+
+        if frame.boxvector:
+            self.filehandle.write("{20.12f}{20.12f}{20.12f}\n{20.12f}{20.12f}{20.12f}\n{20.12f}{20.12f}{20.12f}\n".format(frame.boxvector, 0.0, 0.0, 0.0, frame.boxvector, 0.0, 0.0, 0.0, frame.boxvector))
 
     def _write_main(self, frame=None):
-        pass
+
+        for i in xrange(len(frame['element'])):
+            self.filehandle.write('{0:8s}{1:10d}'.format(frame['element'][i], i+1)
+            self.filehandle.write('{20.12E}{20.12E}{20.12E}'.format(frame['coordinate'][i][0], frame['coordinate'][i][1],frame['coordinate'][i][2])
+
+            if 'velocity' in frame:
+                self.filehandle.write('{20.12E}{20.12E}{20.12E}'.format(frame['velocity'][i][0], frame['velocity'][i][1],frame['velocity'][i][2])
+            else:
+                continue
+            if 'force' in frame:
+                self.filehandle.write('{20.12E}{20.12E}{20.12E}'.format(frame['force'][i][0], frame['force'][i][1],frame['force'][i][2])
