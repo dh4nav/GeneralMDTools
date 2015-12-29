@@ -2,9 +2,8 @@ import AtomEnsemble as ae
 
 class Reader(object):
     def __str__(self):
-        ost = "framepos: " + str(self.framepos) + "\nframelength: " + str(self.framelength) + "\nFrameindex: " + str(self.frameindex)
+        ost = "Framelength: " + str(self.framelength) + "\nFrameindex: " + str(self.frameindex)
         return ost
-
 
     def __init__(self, fileobj=None):
         if type(fileobj) == str:
