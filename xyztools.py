@@ -285,7 +285,10 @@ class XYZWriter(Writer):
 
     def _write_frame_preamble(self, frame=None):
         self.filehandle.write(str(len(frame['element'])) + "\n")
-        self.filehandle.write(str(frame.boxvector) + "\n")
+        if frame.boxvector:
+            self.filehandle.write(str(frame.boxvector) + "\n")
+        else:
+            self.filehandle.write("\n")
 
     def _write_main(self, frame=None):
         for i in xrange(len(frame['element'])):
