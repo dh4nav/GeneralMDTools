@@ -279,8 +279,6 @@ class AtomEnsemble(col.MutableSequence):
             except:
                 flag = False
 
-
-
     def center(self, center_index=None, center_coordinates=None):
         if center_index != None:
             center_coordinates = self.main_list[center_index]['coordinate']
@@ -298,3 +296,38 @@ class AtomEnsemble(col.MutableSequence):
     def get_center(self, weigh_by_mass=False):
         coords = np.array(self['coordinate'])
         return coords.sum(0)/len(coords.sum(1))
+
+    def rotate_single_vector_around_origin(self, vector, angle_x, angle_y, angle_z, degrees=False):
+        """Return vector rotated around origin by 3 angles"""
+
+        if degrees:
+            angle_x = angle_x * (np.pi / 180.0)
+            angle_y = angle_y * (np.pi / 180.0)
+            angle_z = angle_z * (np.pi / 180.0)
+
+        outvector = [0.0,0.0,0.0]
+        v1 = [0.0,0.0,0.0]
+        v2 = [0.0,0.0,0.0]
+
+        v1[0] = vector[0]
+        v1[1] = (vector[1] * np.cos(angle_x)) + (vector[2] * np.sin(angle_x))
+        v1[2] = (vector[1] * np.sin(angle_x) * -1.0) + (vector[2] * np.cos(angle_x))
+
+
+        v2[0] = (v1[0] * np.cos(angle_y)) - (v1[2] * np.sin(angle_y))
+        v2[1] = v1[1]
+        v2[2] = (v1[0] * np.sin(angle_y)) + (v1[2] * np.cos(angle_y))
+
+        outvector[0] = (v2[0] * np.cos(angle_z)) - (v2[1] * np.sin(angle_z))
+        outvector[1] = (v2[0] * np.sin(angle_z)) + (v2[1] * np.cos(angle_z))
+        outvector[2] = v2[2]
+
+        return outvector
+
+    def rotate_around_origin(self, angle_x, angle_y, angle_z, degrees=False):
+        """Return all vectors in frame rotated around origin by 3 vectors"""
+        rotcoords = []
+        for co in self['coordinate']:
+            print co
+            rotcoords.append(self.rotate_single_vector_around_origin(co, angle_x, angle_y, angle_z, degrees=degrees))
+        self['coordinate'] = np.array(rotcoords)
