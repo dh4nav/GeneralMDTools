@@ -84,8 +84,7 @@ class Reader(object):
                 # parser code here
 
     def __getitem__(self, framenum=None):
-        print "fn" + str(framenum)
-        print self.frameindex
+
 
         #deal with slices
         if type(framenum) == slice:
@@ -202,7 +201,6 @@ class DLP2HReader(Reader):
         self.frameindex[0] = self.filehandle.tell()
 
         self.framelength = (self.trajectory_key+2) * self.number_atoms
-
         if self.periodic_key:
             self.framelength += 4
         else:
@@ -215,7 +213,7 @@ class DLP2HReader(Reader):
         return self.framelength
 
     def _get_frame(self, seek=None, frame_length=None, marker=None, frame_number=None):
-        print self.frameindex
+
         #seek if specified
         if seek != None:
             self.filehandle.seek(seek)
@@ -240,36 +238,38 @@ class DLP2HReader(Reader):
 
             for i in xrange(frame_length):
                 line = self.filehandle.readline()
-                print line
                 if len(line) == 0:
                     raise EOFError
                 elements = line.strip().split()
-                print elements
                 atom_position = (i - atoms_start)%atom_length
                 if i == 0:
                     ensemble.timestep = int(elements[1])
                     ensemble.time = float(elements[5])
                     if elements[0].strip() != 'timestep':
                         raise SyntaxError("Word timestep not found. Frame:" + str(frame_number) + ", Line:" + str(i))
-                elif self.periodic_key and (i == 2):
-                    ensemble.boxvector = float(elements[0])
-                elif atom_position == 0:
-                    atomproperties['element'] = elements[0]
-                    atomproperties['mass'] = float(elements[2])
-                    atomproperties['charge'] = float(elements[3])
+                elif self.periodic_key and (i < 4):
+                    if i == 1:
+                        ensemble.boxvector = float(elements[0])
+                    else:
+                        pass
+                else:
+                    if atom_position == 0:
+                        atomproperties['element'] = elements[0]
+                        atomproperties['mass'] = float(elements[2])
+                        atomproperties['charge'] = float(elements[3])
 
-                elif atom_position == 1:
-                    atomproperties['coordinate'] = [float(elements[0]), float(elements[1]), float(elements[2])]
+                    elif atom_position == 1:
+                        atomproperties['coordinate'] = [float(elements[0]), float(elements[1]), float(elements[2])]
 
-                elif atom_position == 2:
-                    atomproperties['velocity'] = [float(elements[0]), float(elements[1]), float(elements[2])]
+                    elif atom_position == 2:
+                        atomproperties['velocity'] = [float(elements[0]), float(elements[1]), float(elements[2])]
 
-                elif atom_position == 3:
-                    atomproperties['force'] = [float(elements[0]), float(elements[1]), float(elements[2])]
+                    elif atom_position == 3:
+                        atomproperties['force'] = [float(elements[0]), float(elements[1]), float(elements[2])]
 
-                if atom_position == (atom_length-1):
-                    ensemble.append(ae.Atom(**atomproperties))
-                    atomproperties = dict()
+                    if atom_position == (atom_length-1):
+                        ensemble.append(ae.Atom(**atomproperties))
+                        atomproperties = dict()
 
             return ensemble
 
