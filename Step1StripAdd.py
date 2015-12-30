@@ -1,5 +1,5 @@
 import AtomEnsemble as ae
-import xyztools as xt
+import iotools as iot
 import os, sys
 
 import argparse as ap
@@ -16,17 +16,18 @@ args = parser.parse_args()
 
 def reader(infile):
     file_name = ""
-    if type(infile) = file:
+    if type(infile) == file:
         file_name = infile.name
     else:
         file_name = infile
 
     if ".xyz" in file_name:
-        reader = xt.XYZReader(fileobj=infile)
+        iot_reader = iot.XYZReader(fileobj=infile)
 
     elif ".dlpolyhist" in file_name:
-        reader = xt.DLP2HReader(fileobj=infile)
+        iot_reader = iot.DLP2HReader(fileobj=infile)
     elif "HISTORY" in file_name:
-        reader = xt.DLP2HReader(fileobj=infile)
+        iot_reader = iot.DLP2HReader(fileobj=infile)
     else:
         raise ImportError("File type not recognized")
+        
