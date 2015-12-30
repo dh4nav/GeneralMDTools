@@ -28,7 +28,7 @@ class Reader(object):
             self.filehandle.seek(seek)
 
         #skip preamble if specified
-        if self.filehandle.tell() = 0:
+        if self.filehandle.tell() == 0:
             if preamble_length != None:
                 for i in xrange(preamble_length):
                     self.filehandle.readline()
