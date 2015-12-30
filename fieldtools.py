@@ -14,6 +14,7 @@ import math
 
 
 class FieldCollection(object):
+    """Base class representing a FIELD file"""
     def read_init(self, input_file):
         self.counter = 0
         self.lines = input_file.readlines()
@@ -23,7 +24,6 @@ class FieldCollection(object):
         print str(self.counter-1) + ": " + self.lines[self.counter-1]
         return self.lines[self.counter-1].strip()
 
-    """Base class representing a FIELD file"""
     def __init__(self, input_file=None):
         """Constructor
             argument input_file: optional file handle for a FIELD file"""
