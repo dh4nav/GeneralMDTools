@@ -20,6 +20,7 @@ class Atom(col.MutableMapping):
             self.__setitem__(key, kwargs[key])
 
     def __getitem__(self, key):
+        #print self.store.keys()
         return self.store[key]
 
     def __setitem__(self, key, value):
@@ -244,21 +245,21 @@ class AtomEnsemble(col.MutableSequence):
         return outstring
 
     def filter(self, keep=None, remove=None):
-        cp = self.copy()
+        #cp = self.copy()
 
         counter = 0
-        while counter < len(cp.main_list):
+        while counter < len(self.main_list):
             if remove:
-                if cp.main_list[counter]['element'] in remove:
-                    del cp.main_list[counter]
+                if self.main_list[counter]['element'] in remove:
+                    del self.main_list[counter]
                     counter -= 1
             elif keep:
-                if cp.main_list[counter]['element'] not in keep:
-                    del cp.main_list[counter]
+                if self.main_list[counter]['element'] not in keep:
+                    del self.main_list[counter]
                     counter -= 1
             counter += 1
 
-        return cp
+        #return cp
 
     # def alter_property(self, value, range=None, property="coordinate"):
     #     property_type = list()
@@ -281,8 +282,11 @@ class AtomEnsemble(col.MutableSequence):
 
     def center(self, center_index=None, center_coordinates=None):
         if center_index != None:
-            center_coordinates = self.main_list[center_index]['coordinate']
-        center_coordinates = np.array(center_coordinates)
+            center_coordinates = self[center_index]['coordinate']
+        elif center_coordinates != None:
+            center_coordinates = np.array(center_coordinates)
+        else:
+            center_coordinates = self.get_center()
         self['coordinate'] = np.subtract(np.array(self['coordinate']), center_coordinates)
 
     def move(self, coords):
@@ -328,7 +332,6 @@ class AtomEnsemble(col.MutableSequence):
         """Return all vectors in frame rotated around origin by 3 vectors"""
         rotcoords = []
         for co in self['coordinate']:
-            print co
             rotcoords.append(self.rotate_vector_around_origin(co, angle_x, angle_y, angle_z, degrees=degrees))
         self['coordinate'] = np.array(rotcoords)
 
