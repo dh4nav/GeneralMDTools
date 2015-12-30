@@ -297,7 +297,7 @@ class AtomEnsemble(col.MutableSequence):
         coords = np.array(self['coordinate'])
         return coords.sum(0)/len(coords.sum(1))
 
-    def rotate_single_vector_around_origin(self, vector, angle_x, angle_y, angle_z, degrees=False):
+    def rotate_vector_around_origin(self, vector, angle_x, angle_y, angle_z, degrees=False):
         """Return vector rotated around origin by 3 angles"""
 
         if degrees:
@@ -329,11 +329,11 @@ class AtomEnsemble(col.MutableSequence):
         rotcoords = []
         for co in self['coordinate']:
             print co
-            rotcoords.append(self.rotate_single_vector_around_origin(co, angle_x, angle_y, angle_z, degrees=degrees))
+            rotcoords.append(self.rotate_vector_around_origin(co, angle_x, angle_y, angle_z, degrees=degrees))
         self['coordinate'] = np.array(rotcoords)
 
     def get_enclosing_radius(self):
         coords = self['coordinate']
         norms = np.linalg.norm(coords, axis=1)
         maxindex = np.argmax(norms)
-        return np.linalg.norm(coords[maxindex])        
+        return np.linalg.norm(coords[maxindex])
