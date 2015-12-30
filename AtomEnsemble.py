@@ -260,24 +260,24 @@ class AtomEnsemble(col.MutableSequence):
 
         return cp
 
-    def alter_property(self, value, range=None, property="coordinate"):
-        property_type = list()
-        value_type = list()
-
-        flag = True
-        while flag:
-            try:
-                property_type.append(self.main_list[0][property])
-            except:
-                flag = False
-
-
-        flag = True
-        while flag:
-            try:
-                value_type.append(value)
-            except:
-                flag = False
+    # def alter_property(self, value, range=None, property="coordinate"):
+    #     property_type = list()
+    #     value_type = list()
+    #
+    #     flag = True
+    #     while flag:
+    #         try:
+    #             property_type.append(self.main_list[0][property])
+    #         except:
+    #             flag = False
+    #
+    #
+    #     flag = True
+    #     while flag:
+    #         try:
+    #             value_type.append(value)
+    #         except:
+    #             flag = False
 
     def center(self, center_index=None, center_coordinates=None):
         if center_index != None:
@@ -331,3 +331,9 @@ class AtomEnsemble(col.MutableSequence):
             print co
             rotcoords.append(self.rotate_single_vector_around_origin(co, angle_x, angle_y, angle_z, degrees=degrees))
         self['coordinate'] = np.array(rotcoords)
+
+    def get_enclosing_radius(self):
+        coords = self['coordinate']
+        norms = np.linalg.norm(coords, axis=1)
+        maxindex = np.argmax(norms)
+        return np.linalg.norm(coords[maxindex])        
