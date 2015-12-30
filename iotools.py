@@ -308,7 +308,7 @@ class XYZWriter(Writer):
                 continue
 
             if 'velocity' in frame:
-                self.filehandle.write" " + str(frame['velocity'][i][0]) + " " + str(frame['velocity'][i][1]) + " " + str(frame['velocity'][i][2]))
+                self.filehandle.write(" " + str(frame['velocity'][i][0]) + " " + str(frame['velocity'][i][1]) + " " + str(frame['velocity'][i][2]))
             else:
                 self.filehandle.write("\n")
                 continue
