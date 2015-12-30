@@ -7,7 +7,14 @@ class Atom(col.MutableMapping):
        function before accessing the keys"""
 
     def __init__(self, **kwargs):
-        self.store = {"element": None, "coordinate": None, "velocity": None, "force": None, "mass": 1.0, "charge": 0.0, "molecule_index": 0}
+        self.store = {
+            "element": None, 
+            "coordinate": None,
+            "velocity": None,
+            "force": None,
+            "mass": 1.0,
+            "charge": 0.0,
+            "molecule_index": 0}
         self.nplist = ["coordinate", "velocity", "force"]
         for key in kwargs:
             self.__setitem__(key, kwargs[key])
@@ -64,7 +71,7 @@ class AtomEnsemble(col.MutableSequence):
 
     def get_pure_list(self, num):
         if type(num) == str:
-            return [v for a in range(len(self.main_list)) for k, v in self.main_list[a].items() if k is num ]
+            return [v for a in range(len(self.main_list)) for k, v in self.main_list[a].items() if k is num]
         elif type(num) == int:
             self.main_list = self.main_list[num]
             return self.main_list
@@ -94,7 +101,8 @@ class AtomEnsemble(col.MutableSequence):
         """Get rich copy"""
         rt = self.copy()
         if type(num) == str:
-            return [v for a in range(len(self.main_list)) for k, v in self.main_list[a].items() if k is num ]
+            ra = xrange(len(self.main_list))
+            return [v for a in ra for k, v in self.main_list[a].items() if k is num ]
         if type(num) == int:
             rt.main_list = rt.main_list[num]
             return rt
