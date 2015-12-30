@@ -7,7 +7,14 @@ class Atom(col.MutableMapping):
        function before accessing the keys"""
 
     def __init__(self, **kwargs):
-        self.store = {"element": None, "coordinate": None, "velocity": None, "force": None, "mass": 1.0, "charge": 0.0, "molecule_index": 0}
+        self.store = dict() #{
+            #"element": None,
+            #"coordinate": None,
+            #"velocity": None,
+            #"force": None,
+            #"mass": 1.0,
+            #"charge": 0.0,
+            #"molecule_index": 0}
         self.nplist = ["coordinate", "velocity", "force"]
         for key in kwargs:
             self.__setitem__(key, kwargs[key])
@@ -43,6 +50,7 @@ class AtomEnsemble(col.MutableSequence):
         self.boxvector = 0.0
         self.filename = ""
         self.framenumber = 0
+        self.header = ""
 
     def __iter__(self):
         return self.main_list.__iter__()
@@ -59,16 +67,19 @@ class AtomEnsemble(col.MutableSequence):
         else:
             raise TypeError("Supported key types: int, str")
 
-    def __getitem__(self, num):
+        return self
+
+    def get_pure_list(self, num):
         if type(num) == str:
-            return [v for a in range(len(self.main_list)) for k, v in self.main_list[a].items() if k is num ]
+            return [v for a in range(len(self.main_list)) for k, v in self.main_list[a].items() if k is num]
         elif type(num) == int:
-            return self.main_list[num]
+            self.main_list = self.main_list[num]
+            return self.main_list
         elif type(num) == slice:
 
             return self.main_list[num]
         elif type(num) == list:
-            [self.__getitem__(a) for a in num]
+            return  [self.__getitem__(a) for a in num]
         else:
             raise TypeError("Supported key types: int, str, slice, list")
 
@@ -86,11 +97,18 @@ class AtomEnsemble(col.MutableSequence):
     #     else:
     #         raise TypeError("Supported key types: int, str, slice, list")
 
-    def __mod__(self, num):
+    def __contains__(self, item):
+        if len(self.main_list):
+            return self.main_list[0].__contains__(item)
+        else:
+            return False
+
+    def __getitem__(self, num):
         """Get rich copy"""
         rt = self.copy()
-        #if type(num) == str:
-        #    return [v for a in range(len(self.main_list)) for k, v in self.main_list[a].items() if k is num ]
+        if type(num) == str:
+            ra = xrange(len(self.main_list))
+            return [v for a in ra for k, v in self.main_list[a].items() if k is num]
         if type(num) == int:
             rt.main_list = rt.main_list[num]
             return rt
@@ -101,12 +119,14 @@ class AtomEnsemble(col.MutableSequence):
             rt.main_list = [rt.__getitem__(a) for a in num]
             return rt
         else:
-            raise TypeError("Supported key types: int, slice, list")
+            raise TypeError("Supported key types: int, str, slice, list")
+
+        return self
 
     def __setitem__(self, num, val):
         if type(num) == str:
             for a in range(len(self.main_list)):
-                self.main_list[a][num] = val
+                self.main_list[a][num] = val[a]
         elif type(num) == int:
             self.main_list[num] = val
         elif type(num) == dict:
@@ -118,14 +138,19 @@ class AtomEnsemble(col.MutableSequence):
         else:
             raise TypeError("Supported key types: int, str, dict, Atom")
 
+        return self
+
     def append(self, obj):
         self.main_list.append(obj)
+        return self
 
     def extend(self, obj):
         self.main_list.extend(obj)
+        return self
 
     def insert(self, idx, obj):
         self.main_list.insert(idx, obj)
+        return self
 
     def copy(self):
         return copy.deepcopy(self)
@@ -141,6 +166,8 @@ class AtomEnsemble(col.MutableSequence):
             self.main_list.append(Atom(**obj))
         else:
             raise TypeError("Supported types: AtomEnsemble, list, dict, Atom")
+
+        return self
 
     def __add__(self, obj):
         #print obj
@@ -165,15 +192,142 @@ class AtomEnsemble(col.MutableSequence):
         else:
             raise TypeError("Supported types: AtomEnsemble, list, dict, Atom")
 
+    def __radd__(self, obj):
+        #print obj
+        #print self
+        oa = self.copy()
+        if type(obj) == AtomEnsemble:
+            oa.main_list.insert(0, obj.main_list)
+            return oa
+            #return self.copy().main_list.extend(obj.main_list)
+        elif type(obj) == list:
+            print "."
+            print oa
+            print ".."
+            print oa.main_list
+            print "..."
+            oa.main_list.reverse()
+            print oa.main_list
+            print "...."
+            obj.main_list.reverse()
+            oa.main_list.append(obj.main_list)
+            oa.main_list.reverse()
+            print oa.main_list
+            #reverse(reverse(oa.main_list).append(reverse(obj.main_list)))
+            #oa.main_list.insert(0, obj)
+            return oa
+            #return self.copy().main_list.extend(obj)
+        elif type(obj) == Atom:
+            oa.main_list.insert(0, obj)
+            return oa
+            #return self.copy().main_list.append(obj)
+        elif type(obj) == dict:
+            oa.main_list.insert(0, Atom(**obj))
+            return oa
+            #return self.copy().main_list.append(Atom(**obj))
+        else:
+            raise TypeError("Supported types: AtomEnsemble, list, dict, Atom")
+
     def __imul__(self, val):
         self.main_list = self.main_list * val
+        return self
 
     def __mul__(self, val):
-        return self.main_list * val
+        print "m"
+        cp = self.copy()
+        cp.main_list = cp.main_list * val
+        return cp
 
     def __str__(self):
         outstring = ""
         outstring += " ".join([str(i) + "\n" for i in self.main_list])
         return outstring
 
-#    def shift_all(coords):
+    def filter(self, keep=None, remove=None):
+        cp = self.copy()
+
+        counter = 0
+        while counter < len(cp.main_list):
+            if remove:
+                if cp.main_list[counter]['element'] in remove:
+                    del cp.main_list[counter]
+                    counter -= 1
+            elif keep:
+                if cp.main_list[counter]['element'] not in keep:
+                    del cp.main_list[counter]
+                    counter -= 1
+            counter += 1
+
+        return cp
+
+    def alter_property(self, value, range=None, property="coordinate"):
+        property_type = list()
+        value_type = list()
+
+        flag = True
+        while flag:
+            try:
+                property_type.append(self.main_list[0][property])
+            except:
+                flag = False
+
+
+        flag = True
+        while flag:
+            try:
+                value_type.append(value)
+            except:
+                flag = False
+
+    def center(self, center_index=None, center_coordinates=None):
+        if center_index != None:
+            center_coordinates = self.main_list[center_index]['coordinate']
+        center_coordinates = np.array(center_coordinates)
+        self['coordinate'] = np.subtract(np.array(self['coordinate']), center_coordinates)
+
+    def move(self, coords):
+        self['coordinate'] = np.add(np.array(self['coordinate']), np.array(coords))
+
+    def accellerate(self, magnitude=1.0, direction=[0.0, 0.0, 0.0]):
+        acc_vect = np.divide(np.array(direction), np.linalg.norm(direction))
+        acc_vect = np.multiply(acc_vect, magnitude)
+        self['velocity'] = np.add(np.array(self['velocity']), acc_vect)
+
+    def get_center(self, weigh_by_mass=False):
+        coords = np.array(self['coordinate'])
+        return coords.sum(0)/len(coords.sum(1))
+
+    def rotate_single_vector_around_origin(self, vector, angle_x, angle_y, angle_z, degrees=False):
+        """Return vector rotated around origin by 3 angles"""
+
+        if degrees:
+            angle_x = angle_x * (np.pi / 180.0)
+            angle_y = angle_y * (np.pi / 180.0)
+            angle_z = angle_z * (np.pi / 180.0)
+
+        outvector = [0.0, 0.0, 0.0]
+        v1 = [0.0, 0.0, 0.0]
+        v2 = [0.0, 0.0, 0.0]
+
+        v1[0] = vector[0]
+        v1[1] = (vector[1] * np.cos(angle_x)) + (vector[2] * np.sin(angle_x))
+        v1[2] = (vector[1] * np.sin(angle_x) * -1.0) + (vector[2] * np.cos(angle_x))
+
+
+        v2[0] = (v1[0] * np.cos(angle_y)) - (v1[2] * np.sin(angle_y))
+        v2[1] = v1[1]
+        v2[2] = (v1[0] * np.sin(angle_y)) + (v1[2] * np.cos(angle_y))
+
+        outvector[0] = (v2[0] * np.cos(angle_z)) - (v2[1] * np.sin(angle_z))
+        outvector[1] = (v2[0] * np.sin(angle_z)) + (v2[1] * np.cos(angle_z))
+        outvector[2] = v2[2]
+
+        return outvector
+
+    def rotate_around_origin(self, angle_x, angle_y, angle_z, degrees=False):
+        """Return all vectors in frame rotated around origin by 3 vectors"""
+        rotcoords = []
+        for co in self['coordinate']:
+            print co
+            rotcoords.append(self.rotate_single_vector_around_origin(co, angle_x, angle_y, angle_z, degrees=degrees))
+        self['coordinate'] = np.array(rotcoords)
