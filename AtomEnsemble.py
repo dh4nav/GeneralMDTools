@@ -126,7 +126,7 @@ class AtomEnsemble(col.MutableSequence):
     def __setitem__(self, num, val):
         if type(num) == str:
             for a in range(len(self.main_list)):
-                self.main_list[a][num] = val
+                self.main_list[a][num] = val[a]
         elif type(num) == int:
             self.main_list[num] = val
         elif type(num) == dict:
@@ -260,7 +260,7 @@ class AtomEnsemble(col.MutableSequence):
 
         return cp
 
-    def alter_property(self, value, range=None, property="coordinates"):
+    def alter_property(self, value, range=None, property="coordinate"):
         property_type = list()
         value_type = list()
 
@@ -281,8 +281,11 @@ class AtomEnsemble(col.MutableSequence):
 
 
 
-    # def center(self, center_index=None, center_coordinates=None):
-    #         if center_index != None:
+    def center(self, center_index=None, center_coordinates=None):
+        if center_index != None:
+            center_coordinates = self.main_list[center_index]['coordinate']
+        center_coordinates = np.array(center_coordinates)
+        self['coordinate'] = np.subtract(np.array(self['coordinate']), center_coordinates)
 
 
 
