@@ -107,7 +107,7 @@ class Reader(object):
             for i in xrange(framenum+1):
                 if i == framenum:
                     return self._get_frame(seek=self.frameindex[framenum], frame_length=self.framelength, frame_number=framenum)
-                elif (i+1) in self.frameindex:
+                elif i+1 in self.frameindex:
                     pass
                 else:
                     self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length=self.framelength)
@@ -374,11 +374,11 @@ class DLP2CWriter(Writer):
 
         for i in xrange(len(frame['element'])):
             self.filehandle.write('\n{0:8s}{1:10d}'.format(frame['element'][i], i+1))
-            self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(frame['coordinate'][i][0], frame['coordinate'][i][1],frame['coordinate'][i][2]))
+            self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(frame['coordinate'][i][0], frame['coordinate'][i][1], frame['coordinate'][i][2]))
 
             if 'velocity' in frame:
-                self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(frame['velocity'][i][0], frame['velocity'][i][1],frame['velocity'][i][2]))
+                self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(frame['velocity'][i][0], frame['velocity'][i][1], frame['velocity'][i][2]))
             else:
                 continue
             if 'force' in frame:
-                self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(frame['force'][i][0], frame['force'][i][1],frame['force'][i][2]))
+                self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(frame['force'][i][0], frame['force'][i][1], frame['force'][i][2]))
