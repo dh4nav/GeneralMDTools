@@ -7,14 +7,14 @@ class Atom(col.MutableMapping):
        function before accessing the keys"""
 
     def __init__(self, **kwargs):
-        self.store = {
-            "element": None,
-            "coordinate": None,
-            "velocity": None,
-            "force": None,
-            "mass": 1.0,
-            "charge": 0.0,
-            "molecule_index": 0}
+        self.store = dict() #{
+            #"element": None,
+            #"coordinate": None,
+            #"velocity": None,
+            #"force": None,
+            #"mass": 1.0,
+            #"charge": 0.0,
+            #"molecule_index": 0}
         self.nplist = ["coordinate", "velocity", "force"]
         for key in kwargs:
             self.__setitem__(key, kwargs[key])
@@ -96,6 +96,12 @@ class AtomEnsemble(col.MutableSequence):
     #         [self.__getitem__(a) for a in num]
     #     else:
     #         raise TypeError("Supported key types: int, str, slice, list")
+
+    def __contains__(self, item):
+        if len(self.main_list):
+            return self.main_list[0].__contains__(item)
+        else:
+            return False
 
     def __getitem__(self, num):
         """Get rich copy"""
