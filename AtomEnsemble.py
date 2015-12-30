@@ -288,8 +288,8 @@ class AtomEnsemble(col.MutableSequence):
     def move(self, coords):
         self['coordinate'] = np.add(np.array(self['coordinate']), np.array(coords))
 
-    def accellerate(self, magnitude=1.0, direction=[0.0,0.0,0.0]):
-        acc_vect = np.divide(np.array(direction),np.linalg.norm(direction))
+    def accellerate(self, magnitude=1.0, direction=[0.0, 0.0, 0.0]):
+        acc_vect = np.divide(np.array(direction), np.linalg.norm(direction))
         acc_vect = np.multiply(acc_vect, magnitude)
         self['velocity'] = np.add(np.array(self['velocity']), acc_vect)
 
@@ -305,9 +305,9 @@ class AtomEnsemble(col.MutableSequence):
             angle_y = angle_y * (np.pi / 180.0)
             angle_z = angle_z * (np.pi / 180.0)
 
-        outvector = [0.0,0.0,0.0]
-        v1 = [0.0,0.0,0.0]
-        v2 = [0.0,0.0,0.0]
+        outvector = [0.0, 0.0, 0.0]
+        v1 = [0.0, 0.0, 0.0]
+        v2 = [0.0, 0.0, 0.0]
 
         v1[0] = vector[0]
         v1[1] = (vector[1] * np.cos(angle_x)) + (vector[2] * np.sin(angle_x))
