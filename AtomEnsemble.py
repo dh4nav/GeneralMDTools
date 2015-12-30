@@ -8,7 +8,7 @@ class Atom(col.MutableMapping):
 
     def __init__(self, **kwargs):
         self.store = {
-            "element": None, 
+            "element": None,
             "coordinate": None,
             "velocity": None,
             "force": None,
@@ -102,7 +102,7 @@ class AtomEnsemble(col.MutableSequence):
         rt = self.copy()
         if type(num) == str:
             ra = xrange(len(self.main_list))
-            return [v for a in ra for k, v in self.main_list[a].items() if k is num ]
+            return [v for a in ra for k, v in self.main_list[a].items() if k is num]
         if type(num) == int:
             rt.main_list = rt.main_list[num]
             return rt
