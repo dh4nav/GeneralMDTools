@@ -31,12 +31,14 @@ class Reader(object):
         if self.filehandle.tell() == 0:
             if preamble_length != None:
                 for i in xrange(preamble_length):
-                    self.filehandle.readline()
+                    if len(self.filehandle.readline()) == 0:
+                        raise EOFError
 
         #read frame_length lines if specified and return position
         if frame_length != None:
             for i in xrange(frame_length):
-                self.filehandle.readline()
+                if len(self.filehandle.readline()) == 0:
+                    raise EOFError
             return self.filehandle.tell()
 
         #else read until marker occurs, return tell from line prior
@@ -45,6 +47,8 @@ class Reader(object):
             last_tell = self.filehandle.tell()
             while marker not in line:
                 line = self.filehandle.readline()
+                if len(line) == 0:
+                    raise EOFError
                 last_tell = self.filehandle.tell()
             return last_tell
 
@@ -65,7 +69,9 @@ class Reader(object):
         #read frame_length lines if specified and return position
         if frame_length != None:
             for i in xrange(frame_length):
-                self.filehandle.readline()
+                line = self.filehandle.readline()
+                if len(line) == 0:
+                    raise EOFError
                 # parser code here
 
         #else read until marker occurs, return tell from line prior
@@ -73,6 +79,8 @@ class Reader(object):
             line = ""
             while marker not in line:
                 line = self.filehandle.readline()
+                if len(line) == 0:
+                    raise EOFError
                 # parser code here
 
     def __getitem__(self, framenum=None):
@@ -99,11 +107,10 @@ class Reader(object):
             for i in xrange(framenum+1):
                 if i == framenum:
                     return self._get_frame(seek=self.frameindex[framenum], frame_length=self.framelength, frame_number=framenum)
-                elif i in self.frameindex:
+                elif (i+1) in self.frameindex:
                     pass
                 else:
                     self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length=self.framelength)
-
         #frame negative
         elif framenum < 0:
             #last frame unknown
@@ -119,14 +126,17 @@ class Reader(object):
                 except:
                     self.frameindex_complete = True
             #last frame known
-            return self._get_frame(seek=self.frameindex[len(self.frameindex) - framenum], frame_length=self.framelength)
+            return self._get_frame(seek=self.frameindex[len(self.frameindex) + framenum], frame_length=self.framelength)
 
 class XYZReader(Reader):
 
     def _get_frame_length(self):
         # implement get frame length here
         self.filehandle.seek(0)
-        return int(self.filehandle.readline().strip())
+        line = self.filehandle.readline()
+        if len(line) == 0:
+            raise EOFError
+        return int(line.strip())+2
 
     def _get_frame(self, seek=None, frame_length=None, marker=None, frame_number=None):
 
@@ -144,6 +154,8 @@ class XYZReader(Reader):
 
             for i in xrange(frame_length):
                 line = self.filehandle.readline().strip()
+                if len(line) == 0:
+                    raise EOFError
                 if i == 1:
                     ensemble.boxvector = float(line)
                 elif i > 1:
@@ -173,9 +185,16 @@ class DLP2HReader(Reader):
 
     def _read_preamble(self):
         self.filehandle.seek(0)
-        self.header = self.filehandle.readline().strip()
+        line = self.filehandle.readline()
+        if len(line) == 0:
+            raise EOFError
+        self.header = line.strip()
 
-        elements = self.filehandle.readline().strip().split()
+        line = self.filehandle.readline()
+        if len(line) == 0:
+            raise EOFError
+        elements = line.strip().split()
+
         self.trajectory_key = int(elements[0])
         self.periodic_key = int(elements[1])
         self.number_atoms = int(elements[2])
@@ -217,7 +236,10 @@ class DLP2HReader(Reader):
             atomproperties = dict()
 
             for i in xrange(frame_length):
-                elements = self.filehandle.readline().strip().split()
+                line = self.filehandle.readline()
+                if len(line) == 0:
+                    raise EOFError
+                elements = line.strip().split()
                 atom_position = (i - atoms_start)%atom_length
                 if i == 0:
                     ensemble.timestep = int(elements[1])
