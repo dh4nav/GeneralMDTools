@@ -1,33 +1,43 @@
 import AtomEnsemble as ae
 import iotools as iot
-import os, sys
+import os, sys, random
+import numpy as np
 
-import argparse as ap
+def frand(minval=0.0, maxval=1.0):
+    return random.uniform(minval, maxval)
 
-parser = ap.ArgumentParser(description="Step 1 for Kavska-Zahn: Strip solvent & add new cluster")
-parser.add_argument("-im", "--in_main", help="main in file name")
-parser.add_argument("-ia", "--in_add", help="add molecule in file name")
-parser.add_argument("-fm", "--field_main", help="main file FIELD file")
-parser.add_argument("-fa", "--field_add", help="add file FIELD file")
-parser.add_argument("-oc", "--config_out", help="CONFIG output file")
-parser.add_argument("-of", "--field_out", help="FIELD outfut file")
-parser.add_argument("-s", "--solvent", help="Solvent atoms", nargs="+")
-args = parser.parse_args()
+#seed random
+random.seed()
 
-def reader(infile):
-    file_name = ""
-    if type(infile) == file:
-        file_name = infile.name
-    else:
-        file_name = infile
+#Get index
+#index = int(sys.argv[1])
 
-    if ".xyz" in file_name:
-        iot_reader = iot.XYZReader(fileobj=infile)
+#Load last frame
+last_frame = iot.DLP2HReader(fileobj="HIk")[-1]
 
-    elif ".dlpolyhist" in file_name:
-        iot_reader = iot.DLP2HReader(fileobj=infile)
-    elif "HISTORY" in file_name:
-        iot_reader = iot.DLP2HReader(fileobj=infile)
-    else:
-        raise ImportError("File type not recognized")
-        
+#Load add cluster
+add_cluster = iot.XYZReader(fileobj="AddCluster.xyz")[-1]
+
+#print last_frame['elements']
+
+#Prepare last frame
+last_frame.filter(remove=["SD", "CD", "OD"])
+last_frame.center()
+lf_radius = last_frame.get_enclosing_radius()
+print lf_radius
+#Prepare addcluster
+add_cluster.center()
+add_cluster.rotate_around_origin(frand(maxval=360.0), frand(maxval=360.0),
+                                 frand(maxval=360.0), degrees=True)
+movevect = add_cluster.rotate_vector_around_origin([lf_radius+20.0, 0.0, 0.0],
+                                                   frand(maxval=360.0),
+                                                   frand(maxval=360.0),
+                                                   frand(maxval=360.0),
+                                                   degrees=True)
+
+print movevect
+add_cluster.move(movevect)
+
+new_cluster = last_frame + add_cluster
+print "\n\n"
+print np.array(new_cluster['coordinate'])
