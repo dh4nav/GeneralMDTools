@@ -180,7 +180,7 @@ class XYZReader(Reader):
 class DLP2HReader(Reader):
 
     def __init__(self, fileobj=None):
-        super.__init__(fileobj)
+        super(DLP2HReader, self).__init__(fileobj)
         self. _read_preamble()
 
     def _read_preamble(self):
@@ -215,10 +215,13 @@ class DLP2HReader(Reader):
         return self.framelength
 
     def _get_frame(self, seek=None, frame_length=None, marker=None, frame_number=None):
-
+        print self.frameindex
         #seek if specified
         if seek != None:
             self.filehandle.seek(seek)
+
+        if frame_number != None:
+            self.filehandle.seek(self.fileindex[frame_number])
 
         #read frame_length lines if specified and return position
         if frame_length != None:
@@ -237,14 +240,16 @@ class DLP2HReader(Reader):
 
             for i in xrange(frame_length):
                 line = self.filehandle.readline()
+                print line
                 if len(line) == 0:
                     raise EOFError
                 elements = line.strip().split()
+                print elements
                 atom_position = (i - atoms_start)%atom_length
                 if i == 0:
                     ensemble.timestep = int(elements[1])
                     ensemble.time = float(elements[5])
-                    if elements[0].strip() is not "timestep":
+                    if elements[0].strip() != 'timestep':
                         raise SyntaxError("Word timestep not found. Frame:" + str(frame_number) + ", Line:" + str(i))
                 elif self.periodic_key and (i == 2):
                     ensemble.boxvector = float(elements[0])
@@ -254,9 +259,12 @@ class DLP2HReader(Reader):
                     atomproperties['charge'] = float(elements[3])
 
                 elif atom_position == 1:
-                    atomproperties['velocity'] = [float(elements[0]), float(elements[1]), float(elements[2])]
+                    atomproperties['coordinate'] = [float(elements[0]), float(elements[1]), float(elements[2])]
 
                 elif atom_position == 2:
+                    atomproperties['velocity'] = [float(elements[0]), float(elements[1]), float(elements[2])]
+
+                elif atom_position == 3:
                     atomproperties['force'] = [float(elements[0]), float(elements[1]), float(elements[2])]
 
                 if atom_position == (atom_length-1):
