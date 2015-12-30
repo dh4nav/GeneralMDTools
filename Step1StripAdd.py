@@ -1,6 +1,7 @@
-import AtomEnsemble as ae
+#import AtomEnsemble as ae
+#import os, sys
 import iotools as iot
-import os, sys, random
+import random
 import numpy as np
 
 def frand(minval=0.0, maxval=1.0):
