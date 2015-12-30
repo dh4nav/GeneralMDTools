@@ -13,13 +13,13 @@ import math
 #         return self.itr[self.pos-1]
 
 
-class FieldCollection():
+class FieldCollection(object):
     def read_init(self, input_file):
         self.counter = 0
         self.lines = input_file.readlines()
 
     def read_next(self):
-        self.counter+=1
+        self.counter += 1
         print str(self.counter-1) + ": " + self.lines[self.counter-1]
         return self.lines[self.counter-1].strip()
 
@@ -135,7 +135,7 @@ class FieldCollection():
         return self.itemlist.__iter__()
 
 
-class MoleculeCollection():
+class MoleculeCollection(object):
     def __init__(self):
         self.molecules = []
 
@@ -167,10 +167,10 @@ class MoleculeCollection():
         return self.molecules.__iter__()
 
 
-class Molecule():
+class Molecule(object):
     def __init__(self):
 
-        self.fields = OrderedDict([('atoms',[]),('shells', []),('bonds', []), ('constraints', []), ('pmf', []), ('angles', []), ('dihedrals', []), ('inversions', []), ('rigids', []), ('tethers', []) ])
+        self.fields = OrderedDict([('atoms', []), ('shells', []), ('bonds', []), ('constraints', []), ('pmf', []), ('angles', []), ('dihedrals', []), ('inversions', []), ('rigids', []), ('tethers', [])])
         self.nummols = 1
         self.name = "Name"
 
@@ -187,50 +187,50 @@ class Molecule():
                 returnstring.extend([item.__str__()])
 
         if self.fields['bonds']:
-            returnstring += ["bonds " + str(len(self.fields['bonds'])) ]
+            returnstring += ["bonds " + str(len(self.fields['bonds']))]
             for item in self.fields['bonds']:
                 returnstring.extend([item.__str__()])
 
         if self.fields['constraints']:
-            returnstring += ["constraints " + str(len(self.fields['constraints'])) ]
+            returnstring += ["constraints " + str(len(self.fields['constraints']))]
             for item in self.fields['constraints']:
                 returnstring.extend([item.__str__()])
 
         if self.fields['pmf']:
-            returnstring += ["pmf " + str(len(self.fields['pmf'])) ]
+            returnstring += ["pmf " + str(len(self.fields['pmf']))]
             for item in self.fields['pmf']:
                 returnstring.extend([item.__str__()])
 
         if self.fields['angles']:
-            returnstring += ["angles " + str(len(self.fields['angles'])) ]
+            returnstring += ["angles " + str(len(self.fields['angles']))]
             for item in self.fields['angles']:
                 returnstring.extend([item.__str__()])
 
         if self.fields['dihedrals']:
-            returnstring +=[ "dihedrals " + str(len(self.fields['dihedrals']))]
+            returnstring += ["dihedrals " + str(len(self.fields['dihedrals']))]
             for item in self.fields['dihedrals']:
                 returnstring.extend([item.__str__()])
 
         if self.fields['inversions']:
-            returnstring += ["inversions " + str(len(self.fields['inversions'])) ]
+            returnstring += ["inversions " + str(len(self.fields['inversions']))]
             for item in self.fields['inversions']:
                 returnstring.extend([item.__str__()])
 
         if self.fields['rigids']:
-            returnstring += ["rigid " + str(len(self.fields['rigids'])) ]
+            returnstring += ["rigid " + str(len(self.fields['rigids']))]
             for item in self.fields['rigids']:
-                returnstring.extend( [item.__str__()])
+                returnstring.extend([item.__str__()])
 
         if self.fields['tethers']:
-            returnstring += ["teth " + str(len(self.fields['tethers'])) ]
+            returnstring += ["teth " + str(len(self.fields['tethers']))]
             for item in self.fields['tethers']:
-                returnstring.extend( [item.__str__()])
+                returnstring.extend([item.__str__()])
 
-        returnstring.extend(  ["finish"])
+        returnstring.extend(["finish"])
 
         return "\n".join(returnstring)
 
-class Molecule_Description_Item_Base():
+class Molecule_Description_Item_Base(object):
 
     def __init__(self, input_file=None, factory=None, minimum_items=0):
         if factory:
@@ -298,7 +298,7 @@ class tether(Molecule_Description_Item_Base):
         Molecule_Description_Item_Base.__init__(self, input_file=input_file, factory=['key', 'index1'], minimum_items=2)
 
 
-class vdws():
+class vdws(object):
     def __init__(self):
         self.fields = []
         self.bases = []
@@ -310,13 +310,13 @@ class vdws():
         for n, e in enumerate(self.bases):
             for m, f in enumerate(self.bases[n:]):
                 outstring.append(e.element + " " + f.element + " LJ " +  str(math.sqrt(float(e.epsilon) + float(f.epsilon))) + " " + str((float(e.sigma) + float(f.sigma))/2.0))
-                outelements.append( (e.element, f.element) )
+                outelements.append((e.element, f.element))
 
         for n, e in enumerate(self.fields):
             if (e.element1, e.element2) in outelements:
-                outstring[outelements.index( (e.element1, e.element2) )] = e.__str__()
+                outstring[outelements.index((e.element1, e.element2))] = e.__str__()
             elif (e.element2, e.element1) in outelements:
-                outstring[outelements.index( (e.element2, e.element1) )] = e.__str__()
+                outstring[outelements.index((e.element2, e.element1))] = e.__str__()
             else:
                 outstring.append(e.__str__())
 
@@ -324,7 +324,7 @@ class vdws():
 
         return "\n".join(outstring)
 
-class vdw_LJ_base():
+class vdw_LJ_base(object):
     def __init__(self, input_file=None):
         self.element = ""
         self.epsilon = 0.0
@@ -337,7 +337,7 @@ class vdw_LJ_base():
             self.sigma = elements[2]
 
 
-class vdw_special():
+class vdw_special(object):
     def __init__(self, input_file=None):
         self.element1 = ""
         self.element2 = ""
