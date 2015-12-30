@@ -79,7 +79,7 @@ class AtomEnsemble(col.MutableSequence):
 
             return self.main_list[num]
         elif type(num) == list:
-            [self.__getitem__(a) for a in num]
+            return  [self.__getitem__(a) for a in num]
         else:
             raise TypeError("Supported key types: int, str, slice, list")
 
@@ -287,6 +287,5 @@ class AtomEnsemble(col.MutableSequence):
         center_coordinates = np.array(center_coordinates)
         self['coordinate'] = np.subtract(np.array(self['coordinate']), center_coordinates)
 
-
-
-#    def shift_all(coords):
+    def move(self, coords):
+        self['coordinate'] = np.add(np.array(self['coordinate']), np.array(coords))
