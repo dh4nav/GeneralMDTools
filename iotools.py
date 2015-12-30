@@ -80,7 +80,7 @@ class Reader(object):
         print self.frameindex
 
         #deal with slices
-        if type(framenum) = slice:
+        if type(framenum) == slice:
             collector = []
             for i in range(slice):
                 collector.append(self.__getitem__(framenum=i))
