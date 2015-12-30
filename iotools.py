@@ -50,11 +50,11 @@ class Reader(object):
 
     def _read_preamble(self):
         # implement read preamble here
-        return Null
+        return None
 
     def _get_frame_length(self):
         # implement get frame length here
-        return Null
+        return None
 
     def _get_frame(self, seek=None, frame_length=None, marker=None, frame_number=None):
 
@@ -91,18 +91,18 @@ class Reader(object):
             self.framelength = self._get_frame_length()
 
         #frame known and positive
-        if framenum in frameindex:
-            return self.get_frame(seek=self.frameindex[framenum], frame_length=self.framelength, frame_number=framenum)
+        if framenum in self.frameindex:
+            return self._get_frame(seek=self.frameindex[framenum], frame_length=self.framelength, frame_number=framenum)
 
         #frame unknown and positive
         elif framenum > -1:
             for i in xrange(framenum+1):
                 if i == framenum:
-                    return self.get_frame(seek=self.frameindex[framenum], frame_length=self.framelength, frame_number=framenum)
+                    return self._get_frame(seek=self.frameindex[framenum], frame_length=self.framelength, frame_number=framenum)
                 elif i in self.frameindex:
                     pass
                 else:
-                    self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length = self.framelength, frame_number=framenum)
+                    self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length=self.framelength)
 
         #frame negative
         elif framenum < 0:
@@ -114,12 +114,12 @@ class Reader(object):
                         if i in self.frameindex:
                             pass
                         else:
-                            self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length = self.framelength)
+                            self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length=self.framelength)
                         i += 1
                 except:
                     self.frameindex_complete = True
             #last frame known
-            return self.get_frame(seek=self.frameindex[len(self.frameindex) - framenum], frame_length=self.framelength)
+            return self._get_frame(seek=self.frameindex[len(self.frameindex) - framenum], frame_length=self.framelength)
 
 class XYZReader(Reader):
 
@@ -145,7 +145,7 @@ class XYZReader(Reader):
             for i in xrange(frame_length):
                 line = self.filehandle.readline().strip()
                 if i == 1:
-                    ensemble.boxvector=float(line)
+                    ensemble.boxvector = float(line)
                 elif i > 1:
                     elements = line.split()
                     atomproperties['element'] = elements[0]
@@ -169,7 +169,7 @@ class DLP2HReader(Reader):
 
     def __init__(self, fileobj=None):
         super.__init__(fileobj)
-        _read_preamble()
+        self. _read_preamble()
 
     def _read_preamble(self):
         self.filehandle.seek(0)
@@ -218,7 +218,7 @@ class DLP2HReader(Reader):
 
             for i in xrange(frame_length):
                 elements = self.filehandle.readline().strip().split()
-                atom_position = (i - atom_start)%atom_length
+                atom_position = (i - atoms_start)%atom_length
                 if i == 0:
                     ensemble.timestep = int(elements[1])
                     ensemble.time = float(elements[5])
@@ -343,20 +343,20 @@ class DLP2CWriter(Writer):
         else:
             self.filehandle.write("      0   ")
 
-        self.filehandle.write("{10d}{20.12f}\n".format(len(frame['element']), 0.0))
+        self.filehandle.write("{0:10d}{1:20.12f}\n".format(len(frame['element']), 0.0))
 
         if frame.boxvector:
-            self.filehandle.write("{20.12f}{20.12f}{20.12f}\n{20.12f}{20.12f}{20.12f}\n{20.12f}{20.12f}{20.12f}\n".format(frame.boxvector, 0.0, 0.0, 0.0, frame.boxvector, 0.0, 0.0, 0.0, frame.boxvector))
+            self.filehandle.write("{0:20.12f}{1:20.12f}{1:20.12f}\n{1:20.12f}{0:20.12f}{1:20.12f}\n{1:20.12f}{1:20.12f}{0:20.12f}\n".format(frame.boxvector, 0.0))
 
     def _write_main(self, frame=None):
 
         for i in xrange(len(frame['element'])):
-            self.filehandle.write('{0:8s}{1:10d}'.format(frame['element'][i], i+1)
-            self.filehandle.write('{20.12E}{20.12E}{20.12E}'.format(frame['coordinate'][i][0], frame['coordinate'][i][1],frame['coordinate'][i][2])
+            self.filehandle.write('{0:8s}{1:10d}'.format(frame['element'][i], i+1))
+            self.filehandle.write('{0:20.12E}{1:20.12E}{2:20.12E}'.format(frame['coordinate'][i][0], frame['coordinate'][i][1],frame['coordinate'][i][2]))
 
             if 'velocity' in frame:
-                self.filehandle.write('{20.12E}{20.12E}{20.12E}'.format(frame['velocity'][i][0], frame['velocity'][i][1],frame['velocity'][i][2])
+                self.filehandle.write('{0:20.12E}{1:20.12E}{2:20.12E}'.format(frame['velocity'][i][0], frame['velocity'][i][1],frame['velocity'][i][2]))
             else:
                 continue
             if 'force' in frame:
-                self.filehandle.write('{20.12E}{20.12E}{20.12E}'.format(frame['force'][i][0], frame['force'][i][1],frame['force'][i][2])
+                self.filehandle.write('{0:20.12E}{1:20.12E}{2:20.12E}'.format(frame['force'][i][0], frame['force'][i][1],frame['force'][i][2]))
