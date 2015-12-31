@@ -21,7 +21,7 @@ class FieldCollection(object):
 
     def read_next(self):
         self.counter += 1
-        print str(self.counter-1) + ": " + self.lines[self.counter-1]
+        #print str(self.counter-1) + ": " + self.lines[self.counter-1]
         return self.lines[self.counter-1].strip()
 
     def append_molecule(self, input_file=None, nummols=1):
@@ -47,7 +47,7 @@ class FieldCollection(object):
                         break
 
                 for n in range(nummols):
-                    print "m"
+                    #print "m"
                     self.itemlist[molcol_index].molecules.append(Molecule())
                     self.itemlist[molcol_index].molecules[-1].name = self.read_next() # molecule name
                     self.itemlist[molcol_index].molecules[-1].nummols = self.read_next().split()[1]
@@ -118,7 +118,7 @@ class FieldCollection(object):
                     self.append_molecule(input_file, nummols=int(elements[1]))
 
                 elif typelist[0] == 'vdw':
-                    print "v"
+                    #print "v"
                     self.itemlist.append(vdws())
                     for _ in range(int(lenlist[0])):
                         self.itemlist[-1].fields.append(vdw_special(self.read_next()))
