@@ -120,7 +120,7 @@ class FieldCollection(object):
                 elif typelist[0] == 'vdw':
                     print "v"
                     self.itemlist.append(vdws())
-                    for n in range(int(lenlist[0])):
+                    for _ in range(int(lenlist[0])):
                         self.itemlist[-1].fields.append(vdw_special(self.read_next()))
 
                 #
@@ -265,7 +265,7 @@ class Molecule_Description_Item_Base(object):
                     listelements = input_file.strip().split()
 
                 elif type(input_file) == str:
-                    with open(input_file, "r") as f:
+                    with open(input_file, "r") as _:
                         listelements = self.read_next().split()
 
             else:
@@ -332,7 +332,7 @@ class vdws(object):
         outelements = []
 
         for n, e in enumerate(self.bases):
-            for m, f in enumerate(self.bases[n:]):
+            for f in self.bases[n:]:
                 outstring.append(e.element + " " + f.element + " LJ " +  str(math.sqrt(float(e.epsilon) + float(f.epsilon))) + " " + str((float(e.sigma) + float(f.sigma))/2.0))
                 outelements.append((e.element, f.element))
 
