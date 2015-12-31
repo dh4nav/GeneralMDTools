@@ -141,6 +141,7 @@ class FieldCollection(object):
         for item in self.itemlist:
             returnstring.extend([item.__str__()])
 
+        returnstring.extend(["close"])
         return "\n".join(returnstring)
 
     def __len__(self):
