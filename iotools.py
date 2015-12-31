@@ -125,7 +125,7 @@ class Reader(object):
                         else:
                             self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length=self.framelength)
                         i += 1
-                except EOFError:
+                except Exception:
                     self.frameindex_complete = True
             #last frame known
             return self._get_frame(seek=self.frameindex[len(self.frameindex) + framenum], frame_length=self.framelength)
