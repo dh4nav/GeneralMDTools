@@ -292,12 +292,16 @@ class AtomEnsemble(col.MutableSequence):
     def move(self, coords):
         self['coordinate'] = np.add(np.array(self['coordinate']), np.array(coords))
 
-    def accellerate(self, magnitude=1.0, direction=[0.0, 0.0, 0.0]):
+    def accellerate(self, magnitude=None, direction=None):
+        if magnitude == None:
+            magnitude = 1.0
+        if direction == None:
+            direction = [0.0, 0.0, 0.0]
         acc_vect = np.divide(np.array(direction), np.linalg.norm(direction))
         acc_vect = np.multiply(acc_vect, magnitude)
         self['velocity'] = np.add(np.array(self['velocity']), acc_vect)
 
-    def get_center(self, weigh_by_mass=False):
+    def get_center(self): #, weigh_by_mass=False):
         coords = np.array(self['coordinate'])
         return coords.sum(0)/len(coords.sum(1))
 
