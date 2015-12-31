@@ -131,12 +131,12 @@ class FieldCollection(object):
 
 
     def __str__(self):
-        returnstring = [self.title]
-        returnstring.extend(["UNITS " + self.units])
+        returnstring = [self.title.strip()]
+        returnstring.extend(["UNITS " + self.units.strip()])
         if self.neutralchargegroups:
             returnstring.extend("SOMETHING")
-        else:
-            returnstring.extend([" "])
+        # else:
+        #     returnstring.extend([" "])
 
         for item in self.itemlist:
             returnstring.extend([item.__str__()])
@@ -169,7 +169,7 @@ class MoleculeCollection(object):
         for item in self.molecules:
             nummols += int(item.nummols)
 
-        returnstring = ["MOLECULES " + str(nummols)]
+        returnstring = ["Molecules " + str(nummols)]
 
         for item in self.molecules:
             returnstring.extend([item.__str__()])
