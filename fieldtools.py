@@ -24,7 +24,7 @@ class FieldCollection(object):
         print str(self.counter-1) + ": " + self.lines[self.counter-1]
         return self.lines[self.counter-1].strip()
 
-    def append_molecule(self, input_file=None, nummols=None):
+    def append_molecule(self, input_file=None, nummols=1):
         if input_file:
             with open(input_file) as f:
                 self.read_init(f)
