@@ -24,6 +24,67 @@ class FieldCollection(object):
         print str(self.counter-1) + ": " + self.lines[self.counter-1]
         return self.lines[self.counter-1].strip()
 
+    def append_molecule(self, input_file=None, nummols=None):
+        if input_file:
+            with open(input_file) as f:
+                self.read_init(f)
+            typelist = []
+            lenlist = []
+
+            while True:
+                # elements = self.read_next().split()
+                #
+                # if elements[0].lower() == "close":
+                #     return
+                #
+                # typelist.append(elements[0].lower())
+                # lenlist.append(elements[1])
+
+                molcol_index = 0
+                for n, i in enumerate(self.itemlist):
+                    if type(i) == MoleculeCollection:
+                        molcol_index = n
+                        break
+
+                for n in range(nummols):
+                    print "m"
+                    self.itemlist[molcol_index].molecules.append(Molecule())
+                    self.itemlist[molcol_index].molecules[-1].name = self.read_next() # molecule name
+                    self.itemlist[molcol_index].molecules[-1].nummols = self.read_next().split()[1]
+                    while True:
+                        elements = self.read_next().split()
+                        elements[0] = elements[0].lower()
+                        if elements[0] == "atoms":
+                            for i in range(int(elements[1])):
+                                self.itemlist[molcol_index].molecules[-1].fields['atoms'].append(atom(input_file=self.read_next()))
+                        # TODO add shell directive
+                        elif elements[0] == "bonds":
+                            for i in range(int(elements[1])):
+                                self.itemlist[molcol_index].molecules[-1].fields['bonds'].append(bond(input_file=self.read_next()))
+                        # elif elements[0] == "constraints":
+                        #     for i in range(int(elements[1])):
+                        #         self.itemlist[-1].molecules[-1].fields['constraints'].append(constraint(input_file=self.read_next()))
+                        # TODO add pmf
+                        elif elements[0] == "angles":
+                            for i in range(int(elements[1])):
+                                self.itemlist[molcol_index].molecules[-1].fields['angles'].append(angle(input_file=self.read_next()))
+                        elif elements[0] == "dihedrals":
+                            for i in range(int(elements[1])):
+                                self.itemlist[molcol_index].molecules[-1].fields['dihedrals'].append(dihedral(input_file=self.read_next()))
+                        elif elements[0] == "inversions":
+                            for i in range(int(elements[1])):
+                                self.itemlist[molcol_index].molecules[-1].fields['inversions'].append(inversion(input_file=self.read_next()))
+                        # elif elements[0] == "rigid":
+                        #     for i in range(int(elements[1])):
+                        #         self.itemlist[-1].molecules[-1].fields['rigid'].append(atom(input_file=self.read_next()))
+                        # elif elements[0] == "teth":
+                        #     for i in range(int(elements[1])):
+                        #         self.itemlist[-1].molecules[-1].fields['teth'].append(tether(input_file=self.read_next()))
+                        elif elements[0] == "finish":
+                            return
+                typelist.pop()
+                lenlist.pop()
+
     def __init__(self, input_file=None):
         """Constructor
             argument input_file: optional file handle for a FIELD file"""
@@ -31,7 +92,7 @@ class FieldCollection(object):
         self.title = "Title"
         self.units = "kcal"
         self.neutralchargegroups = False
-
+        self.itemlist.append(MoleculeCollection())
         if input_file:
             with open(input_file) as f:
                 self.read_init(f)
@@ -41,6 +102,7 @@ class FieldCollection(object):
             self.title = self.read_next() # comment/title
             self.units = self.read_next().split()[1] #unit
             #self.read_next() # neutral/charge groups TODO do something about neutral charge groups
+
 
             while True:
                 elements = self.read_next().split()
@@ -53,46 +115,8 @@ class FieldCollection(object):
 
                 if typelist[0] == "molecules":
                     self.itemlist.append(MoleculeCollection())
-                    nummols = int(elements[1])
-                    print "N"+str(nummols)
-                    for n in range(nummols):
-                        print "m"
-                        self.itemlist[-1].molecules.append(Molecule())
-                        self.itemlist[-1].molecules[-1].name = self.read_next() # molecule name
-                        self.itemlist[-1].molecules[-1].nummols = self.read_next().split()[1]
-                        while True:
-                            elements = self.read_next().split()
-                            elements[0] = elements[0].lower()
-                            if elements[0] == "atoms":
-                                for i in range(int(elements[1])):
-                                    self.itemlist[-1].molecules[-1].fields['atoms'].append(atom(input_file=self.read_next()))
-                            # TODO add shell directive
-                            elif elements[0] == "bonds":
-                                for i in range(int(elements[1])):
-                                    self.itemlist[-1].molecules[-1].fields['bonds'].append(bond(input_file=self.read_next()))
-                            # elif elements[0] == "constraints":
-                            #     for i in range(int(elements[1])):
-                            #         self.itemlist[-1].molecules[-1].fields['constraints'].append(constraint(input_file=self.read_next()))
-                            # TODO add pmf
-                            elif elements[0] == "angles":
-                                for i in range(int(elements[1])):
-                                    self.itemlist[-1].molecules[-1].fields['angles'].append(angle(input_file=self.read_next()))
-                            elif elements[0] == "dihedrals":
-                                for i in range(int(elements[1])):
-                                    self.itemlist[-1].molecules[-1].fields['dihedrals'].append(dihedral(input_file=self.read_next()))
-                            elif elements[0] == "inversions":
-                                for i in range(int(elements[1])):
-                                    self.itemlist[-1].molecules[-1].fields['inversions'].append(inversion(input_file=self.read_next()))
-                            # elif elements[0] == "rigid":
-                            #     for i in range(int(elements[1])):
-                            #         self.itemlist[-1].molecules[-1].fields['rigid'].append(atom(input_file=self.read_next()))
-                            # elif elements[0] == "teth":
-                            #     for i in range(int(elements[1])):
-                            #         self.itemlist[-1].molecules[-1].fields['teth'].append(tether(input_file=self.read_next()))
-                            elif elements[0] == "finish":
-                                break
-                    typelist.pop()
-                    lenlist.pop()
+                    self.append_molecule(input_file, nummols=int(elements[1]))
+
                 elif typelist[0] == 'vdw':
                     print "v"
                     self.itemlist.append(vdws())
