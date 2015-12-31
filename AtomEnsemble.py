@@ -1,6 +1,7 @@
 import collections as col
 import copy
 import numpy as np
+import scipy.spatial.distance as ssd
 
 class Atom(col.MutableMapping):
     """A dictionary that applies an arbitrary key-altering
@@ -347,3 +348,12 @@ class AtomEnsemble(col.MutableSequence):
         norms = np.linalg.norm(coords, axis=1)
         maxindex = np.argmax(norms)
         return np.linalg.norm(coords[maxindex])
+
+    def intersect(self, other, mindist=2.0):
+        o2 = other.copy()
+        dmatrix = ssd.cdist(np.array(self['coordinate']), np.array(o2['coordinate']))
+        dmatrix = dmatrix.max(axis=0)
+        for n, e in enumerate(dmatrix):
+            if e < mindist:
+                del o2[n]
+        self = self + o2
