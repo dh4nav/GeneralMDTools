@@ -353,7 +353,29 @@ class AtomEnsemble(col.MutableSequence):
         o2 = other.copy()
         dmatrix = ssd.cdist(np.array(self['coordinate']), np.array(o2['coordinate']))
         dmatrix = dmatrix.max(axis=0)
+        dellist = []
         for n, e in enumerate(dmatrix):
             if e < mindist:
-                del o2[n]
-        self = self + o2
+                dellist.append(n)
+        for e in reversed(dellist):
+            del o2[e]
+        self += o2
+
+    def intersect_molecules(self, other, mindist=2.0, mollen=1):
+        o2 = other.copy()
+        dmatrix = ssd.cdist(np.array(self['coordinate']), np.array(o2['coordinate']))
+        dmatrix = dmatrix.max(axis=0)
+        dellist = []
+        skipflag = False
+        for n, e in enumerate(dmatrix):
+            if n%mollen == 0:
+                skipflag = False
+            if skipflag:
+                continue
+            if e < mindist:
+                dellist.extend(range(n-(n%mollen), n+mollen-((n%mollen))))
+                skipflag = True
+        print dellist
+        for e in reversed(dellist):
+            del o2[e]
+        self += o2
