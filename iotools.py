@@ -281,9 +281,9 @@ class Writer(object):
     def __init__(self, fileobj=None, overwrite=False):
         if type(fileobj) == str:
             if overwrite:
-                self.filehandle = open(fileobj, "w")
+                self.filehandle = open(fileobj, "w", 0)
             else:
-                self.filehandle = open(fileobj, "a")
+                self.filehandle = open(fileobj, "a", 0)
         elif type(fileobj) == file:
             self.filehandle = fileobj
 
@@ -302,6 +302,7 @@ class Writer(object):
                 self._write_global_preamble(frame)
             self._write_frame_preamble(frame)
             self._write_main(frame)
+            self.filehandle.flush()
 
     def _write_global_preamble(self, frame=None):
         pass
