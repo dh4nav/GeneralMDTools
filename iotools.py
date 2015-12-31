@@ -30,13 +30,13 @@ class Reader(object):
         #skip preamble if specified
         if self.filehandle.tell() == 0:
             if preamble_length != None:
-                for i in xrange(preamble_length):
+                for _ in xrange(preamble_length):
                     if len(self.filehandle.readline()) == 0:
                         raise EOFError
 
         #read frame_length lines if specified and return position
         if frame_length != None:
-            for i in xrange(frame_length):
+            for _ in xrange(frame_length):
                 if len(self.filehandle.readline()) == 0:
                     raise EOFError
             return self.filehandle.tell()
@@ -66,9 +66,12 @@ class Reader(object):
         if seek != None:
             self.filehandle.seek(seek)
 
+        if frame_number in self.frameindex:
+            self.filehandle.seek(self.frameindex[frame_number])
+
         #read frame_length lines if specified and return position
         if frame_length != None:
-            for i in xrange(frame_length):
+            for _ in xrange(frame_length):
                 line = self.filehandle.readline()
                 if len(line) == 0:
                     raise EOFError
@@ -122,7 +125,7 @@ class Reader(object):
                         else:
                             self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length=self.framelength)
                         i += 1
-                except:
+                except EOFError:
                     self.frameindex_complete = True
             #last frame known
             return self._get_frame(seek=self.frameindex[len(self.frameindex) + framenum], frame_length=self.framelength)
