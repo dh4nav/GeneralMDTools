@@ -120,12 +120,14 @@ class Reader(object):
                 i = 0
                 try:
                     while True:
-                        if i in self.frameindex:
+                        if i+1 in self.frameindex:
                             pass
                         else:
                             self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length=self.framelength)
                         i += 1
-                except Exception:
+                except EOFError:
+                    #remove highest index (end of file)
+                    del self.frameindex[max(self.frameindex.keys())]
                     self.frameindex_complete = True
             #last frame known
             return self._get_frame(seek=self.frameindex[len(self.frameindex) + framenum], frame_length=self.framelength)
