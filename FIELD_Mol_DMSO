@@ -1,0 +1,16 @@
+DMSO
+nummols 1 
+atoms  4       mass        charge    rept
+SD         32.066        0.139     1   0    0d.a
+CD         15.000        0.160     1   0    0.da
+CD         15.000        0.160     1   0    0.da
+OD         15.9999      -0.459     1   0    0d.a
+BONDS 3
+harm    1    2  1860.0     1.81
+harm    1    3  5860.0     1.44
+harm    1    4  5860.0     1.44
+ANGLES 3
+harm     2    1    3  620.0       107.00
+harm     2    1    4  620.0       107.00
+harm     3    1    4  520.0       99.00
+finish

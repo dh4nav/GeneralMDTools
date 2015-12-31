@@ -1,0 +1,11 @@
+tip3p water
+nummols  1     
+atoms 3
+OW        16.0000      -0.83400     1    0    0d.a
+HW         1.0000       0.41700     1    0    0.h.
+HW         1.0000       0.41700     1    0    0.h.
+constraints 3
+   1    2    0.9572
+   1    3    0.9572
+   2    3    1.5139
+finish

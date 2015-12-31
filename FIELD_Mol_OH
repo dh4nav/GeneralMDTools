@@ -1,0 +1,8 @@
+HYDROXIDE
+nummols 1
+atoms 2
+OH         15.9999      -1.3000    1   0 
+HH          1.0000       0.3000    1   0 
+BONDS 1
+harm    1    2  4410.8     0.9572
+finish
