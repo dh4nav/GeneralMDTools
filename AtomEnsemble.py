@@ -298,11 +298,7 @@ class AtomEnsemble(col.MutableSequence):
         if direction == None:
             direction = [0.0, 0.0, 0.0]
         acc_vect = np.divide(np.array(direction), np.linalg.norm(direction))
-        print "A"
-        print acc_vect
         acc_vect = np.multiply(acc_vect, magnitude)
-        print acc_vect
-        print self['velocity']
         if zero:
             self['velocity'] = [acc_vect] * len(self['element'])
         else:
