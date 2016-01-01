@@ -48,19 +48,33 @@ new_cluster = last_frame + add_cluster
 
 #construct field file
 ff = ft.FieldCollection(input_file="FIELD_vdw_minus")
-for atom in new_cluster['element']:
-    if atom == "BI":
-        ff.append_molecule("FIELD_Mol_BI")
-    elif atom == "OI":
-        ff.append_molecule("FIELD_Mol_OI")
-    elif atom == "OH":
-        ff.append_molecule("FIELD_Mol_OH")
-    elif atom == "NN":
-        ff.append_molecule("FIELD_Mol_NO3")
-    elif atom == "SD":
-        ff.append_molecule("FIELD_Mol_DMSO")
-    elif atom == "OW":
-        ff.append_molecule("FIELD_Mol_H2O")
+for index, atom in enumerate(new_cluster['element']):
+    if index < len(last_frame['element']):
+        if atom == "BI":
+            ff.append_molecule("FIELD_Mol_BI_fixed")
+        elif atom == "OI":
+            ff.append_molecule("FIELD_Mol_OI_fixed")
+        elif atom == "OH":
+            ff.append_molecule("FIELD_Mol_OH_fixed")
+        elif atom == "NN":
+            ff.append_molecule("FIELD_Mol_NO3_fixed")
+        elif atom == "SD":
+            ff.append_molecule("FIELD_Mol_DMSO_fixed")
+        elif atom == "OW":
+            ff.append_molecule("FIELD_Mol_H2O_fixed")
+    else:
+        if atom == "BI":
+            ff.append_molecule("FIELD_Mol_BI")
+        elif atom == "OI":
+            ff.append_molecule("FIELD_Mol_OI")
+        elif atom == "OH":
+            ff.append_molecule("FIELD_Mol_OH")
+        elif atom == "NN":
+            ff.append_molecule("FIELD_Mol_NO3")
+        elif atom == "SD":
+            ff.append_molecule("FIELD_Mol_DMSO")
+        elif atom == "OW":
+            ff.append_molecule("FIELD_Mol_H2O")
 
 field_out = open("FIELD", "w")
 field_out.write(str(ff))
