@@ -379,3 +379,76 @@ class AtomEnsemble(col.MutableSequence):
         for e in reversed(dellist):
             del o2[e]
         self += o2
+
+    def get_chains(self, dist=2.0):
+
+        dmatrix = ssd.cdist(np.array(self['coordinate']), np.array(self['coordinate']))
+        chains = range(1, len(self.main_list)+1)
+        current_net = 0
+
+        for n, e in enumerate(dmatrix):
+            current_net = n+1
+            for m, f in enumerate(e):
+                if n == m:
+                    continue
+                else:
+                    if f < dist:
+                        if chains[m] == current_net:
+                            continue
+                        else:
+                            if chains[m] < current_net:
+                                for i in range(len(chains)):
+                                    if chains[i] == current_net:
+                                        chains[i] = chains[m]
+                                current_net = chains[m]
+                            else:
+                                for i in range(len(chains)):
+                                    if chains[i] == chains[m]:
+                                        chains[i] = current_net
+
+        counter = 0
+        for i in range(1, len(chains)+1):
+            if i in chains:
+                counter += 1
+
+        return counter
+
+    def get_approaches(self, species_a, species_b, dmin, dmax):
+        #copy self and filter to get desired groups of atoms
+        if type(species_a) != list:
+            species_a = [species_a]
+        if type(species_b) != list:
+            species_b = [species_b]
+        copy_a = self.copy()
+        copy_b = self.copy()
+        copy_a.filter(keep=species_a)
+        copy_b.filter(keep=species_b)
+
+        #get distmatrix and filter out pairs that match the criteria
+        dmatrix = ssd.cdist(np.array(copy_a['coordinate']), np.array(copy_b['coordinate']))
+        pairlist = []
+        for n, e in enumerate(dmatrix):
+            for m, f in enumerate(e[:n]):
+                if n == m:
+                    continue
+                elif (f < dmax) and (f > dmin):
+                    pairlist.append((n, m))
+
+        # get two lists (one for each species) that have the original index
+        # on a position equivalent to the index in the filered lists
+        translation_list_a = []
+        translation_list_b = []
+
+        for n, e in enumerate(self['element']):
+            if e in species_a:
+                translation_list_a.append(n)
+            if e in species_b:
+                translation_list_b.append(n)
+
+        final_pair_list = []
+
+        # translate back using these lists
+        for e in pairlist:
+            final_pair_list.append((translation_list_a[e[0]], translation_list_b[e[1]]))
+
+        return final_pair_list
