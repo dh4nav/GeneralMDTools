@@ -224,7 +224,7 @@ class DLP2HReader(Reader):
             self.filehandle.seek(seek)
 
         if frame_number != None:
-            self.filehandle.seek(self.fileindex[frame_number])
+            self.filehandle.seek(self.frameindex[frame_number])
 
         #read frame_length lines if specified and return position
         if frame_length != None:
