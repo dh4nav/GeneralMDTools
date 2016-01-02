@@ -349,6 +349,16 @@ class AtomEnsemble(col.MutableSequence):
         maxindex = np.argmax(norms)
         return np.linalg.norm(coords[maxindex])
 
+    def get_bounding_box(self):
+        coords_flat = np.array(self['coordinate']).flatten()
+        cmax = coords_flat.max()
+        cmin = coords_flat.min() * -1.0
+
+        if cmax > cmin:
+            return cmax
+        else:
+            return cmin
+
     def intersect(self, other, mindist=2.0):
         o2 = other.copy()
         dmatrix = ssd.cdist(np.array(self['coordinate']), np.array(o2['coordinate']))
