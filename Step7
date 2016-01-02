@@ -1,7 +1,7 @@
 #import AtomEnsemble as ae
 import os
 #import sys
-import fieldtools as ft
+#import fieldtools as ft
 import iotools as iot
 import random
 #import numpy as np
