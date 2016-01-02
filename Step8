@@ -1,0 +1,87 @@
+#import AtomEnsemble as ae
+import os
+#import sys
+import fieldtools as ft
+import iotools as iot
+import random
+#import numpy as np
+
+run_length = 2000000 # number of simulation frames to run before we quit
+
+def frand(minval=0.0, maxval=1.0):
+    return random.uniform(minval, maxval)
+
+#seed random
+random.seed()
+
+def recurse_make_water(frame):
+    pairs = frame.get_approaches("OH", "HH", 1.5, 2.0)
+    if len(pairs) == 0:
+        return True
+    else:
+        o_pos = pairs[0][0]
+        h_pos = pairs[0][1]
+
+        h = frame[h_pos].copy()
+        h['element'] = 'HW'
+        frame[h_pos-1]['element'] = 'OI'
+        frame[o_pos]['element'] = 'OW'
+        frame[o_pos+1]['element'] = 'HW'
+        frame.main_list.insert(o_pos+2, h)
+        del frame.main_list[h_pos]
+
+        #continue here if we ever need to fix the angles
+        #if o_pos > h_pos:
+        #    o_pos -= 1
+        #...
+
+        return recurse_make_water(frame)
+
+#Get index
+#index = int(sys.argv[1])
+
+#Load last frame
+last_frame_reader = iot.DLP2HReader(fileobj="HIk")
+
+for f in last_frame_reader:
+    if len(f.get_approaches("OH", "HH", 1.5, 2.0)) != 0:
+        recurse_make_water(f)
+
+        ff = ft.FieldCollection(input_file="FIELD_vdw_plus")
+        for index, atom in enumerate(f['element']):
+            if atom == "BI":
+                ff.append_molecule("FIELD_Mol_BI_fixed")
+            elif atom == "OI":
+                ff.append_molecule("FIELD_Mol_OI_fixed")
+            elif atom == "OH":
+                ff.append_molecule("FIELD_Mol_OH_fixed")
+            elif atom == "NN":
+                ff.append_molecule("FIELD_Mol_NO3_fixed")
+            elif atom == "SD":
+                ff.append_molecule("FIELD_Mol_DMSO_fixed")
+            elif atom == "OW":
+                ff.append_molecule("FIELD_Mol_H2O")
+
+        field_out = open("FIELD", "w")
+        field_out.write(str(ff))
+        field_out.close()
+
+        field_out = open("FIELD8", "w")
+        field_out.write(str(ff))
+        field_out.close()
+
+        conf_writer = iot.DLP2CWriter(fileobj="CONFIG", overwrite=True)
+        conf_writer.write(f)
+        del conf_writer
+
+        conf_writer = iot.DLP2CWriter(fileobj="CONFIG8", overwrite=True)
+        conf_writer.write(f)
+        del conf_writer
+
+        os.system("rm timecounter")
+        os.system("cp CONTROL8 CONTROL")
+
+        #Step2
+        exit()
+
+    # why are we here? There's a problem somewhere
