@@ -17,6 +17,11 @@ class Reader(object):
         self.frameindex = {0: 0}
         self.frameindex_complete = False
 
+    def __len__(self):
+        if self.frameindex_complete == False:
+            self._populate_frameindex()
+        return len(self.frameindex)
+
     def _get_next_frame_start(self, seek=None, frame_length=None, preamble_length=None, marker=None):
 
         #throw exception if neither marker nor frame_length are specified
@@ -116,21 +121,24 @@ class Reader(object):
         #frame negative
         elif framenum < 0:
             #last frame unknown
-            if self.frameindex_complete == False:
-                i = 0
-                try:
-                    while True:
-                        if i+1 in self.frameindex:
-                            pass
-                        else:
-                            self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length=self.framelength)
-                        i += 1
-                except EOFError:
-                    #remove highest index (end of file)
-                    del self.frameindex[max(self.frameindex.keys())]
-                    self.frameindex_complete = True
+            self._populate_frameindex()
             #last frame known
             return self._get_frame(seek=self.frameindex[len(self.frameindex) + framenum], frame_length=self.framelength)
+
+    def _populate_frameindex(self):
+        if self.frameindex_complete == False:
+            i = 0
+            try:
+                while True:
+                    if i+1 in self.frameindex:
+                        pass
+                    else:
+                        self.frameindex[i+1] = self._get_next_frame_start(seek=self.frameindex[i], frame_length=self.framelength)
+                    i += 1
+            except EOFError:
+                #remove highest index (end of file)
+                del self.frameindex[max(self.frameindex.keys())]
+                self.frameindex_complete = True
 
 class XYZReader(Reader):
 
