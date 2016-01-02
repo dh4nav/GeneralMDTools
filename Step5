@@ -49,5 +49,5 @@ conf_writer = iot.DLP2CWriter(fileobj="CONFIG5", overwrite=True)
 conf_writer.write(last_frame)
 del conf_writer
 
-os.system('cp CONTROL5 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -q work -N step6 -W depend=afterany:${PBS_JOBID} ./Step6')
+os.system('cp CONTROL5 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -q work -N step6 -W depend=afterany:${PBS_JOBID} /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
 #start step6
