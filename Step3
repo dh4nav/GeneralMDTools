@@ -33,7 +33,6 @@ else:
     last_frame.center()
     solvate_hull.center()
     last_frame.intersect_molecules(solvate_hull, 3.5, 4)
-    last_frame.boxvector = solvate_hull.get_bounding_box()
 
     #construct field file
     ff = ft.FieldCollection(input_file="FIELD_vdw_minus")
@@ -72,6 +71,8 @@ else:
     field_out = open("FIELD3", "w")
     field_out.write(str(ff))
     field_out.close()
+
+    last_frame.boxvector = last_frame.get_bounding_box()
 
     conf_writer = iot.DLP2CWriter(fileobj="CONFIG", overwrite=True)
     conf_writer.write(last_frame)
