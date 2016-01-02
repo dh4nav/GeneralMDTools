@@ -18,7 +18,7 @@ random.seed()
 #index = int(sys.argv[1])
 
 #Load last frame
-last_frame_reader = iot.DLP2HReader(fileobj="HIk")
+last_frame_reader = iot.DLP2HReader(fileobj="HISTORY")
 last_frame = last_frame_reader[-1]
 
 timecounter = len(last_frame_reader)
@@ -35,11 +35,12 @@ else:
 
             with open("timecounter", "w") as f:
                 f.write("0") #reset time
-            # step 8
+            os.system('qsub -l nodes=2:ppn=40,walltime=4:00:00 -q work -N step6 -W depend=afterany:${PBS_JOBID} ./Step8')
             exit()
 
     with open("timecounter", "w") as f:
         f.write(str(timecounter))
 
-    os.system("mv REVCON CONFIG; mv REVIVE REVOLD")
+    os.system("mv REVCON CONFIG; mv REVIVE REVOLD; mv CONTROL5R CONTROL; cat HISTORYX HISTORY > HISTORYX; rm HISTORY")
+    os.system('qsub -l nodes=5:ppn=40,walltime=4:00:00 -q work -N step6 -W depend=afterany:${PBS_JOBID} ./Step6')
     #step6
