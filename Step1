@@ -84,6 +84,8 @@ field_out = open("FIELD1", "w")
 field_out.write(str(ff))
 field_out.close()
 
+new_cluster.boxvector = new_cluster.get_bounding_box()
+
 conf_writer = iot.DLP2CWriter(fileobj="CONFIG", overwrite=True)
 conf_writer.write(new_cluster)
 del conf_writer
