@@ -49,4 +49,4 @@ conf_writer = iot.DLP2CWriter(fileobj="CONFIG5", overwrite=True)
 conf_writer.write(last_frame)
 del conf_writer
 
-#start step2
+#start step6
