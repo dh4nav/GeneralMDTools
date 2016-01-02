@@ -22,8 +22,9 @@ last_frame_reader = iot.DLP2HReader(fileobj="HIk")
 last_frame = last_frame_reader[-1]
 
 timecounter = len(last_frame_reader)
-with open("timecounter") as f:
-    timecounter += str(f.readline().strip())
+if os.path.isfile("timecounter"):
+    with open("timecounter") as f:
+        timecounter += str(f.readline().strip())
 
 if timecounter > run_length:
     pass # rinse and repeat with step 1
