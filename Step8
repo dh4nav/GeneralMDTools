@@ -81,7 +81,7 @@ for f in last_frame_reader:
         os.system("rm timecounter")
         os.system("cp CONTROL8 CONTROL")
 
-        #Step2
+        os.system('qsub -l nodes=5:ppn=40,walltime=4:00:00 -q work -N step6 -W depend=afterany:${PBS_JOBID} ./Step2')
         exit()
 
     # why are we here? There's a problem somewhere
