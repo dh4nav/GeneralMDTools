@@ -1,0 +1,52 @@
+#import AtomEnsemble as ae
+#import os, sys
+import fieldtools as ft
+import iotools as iot
+import random
+#import numpy as np
+
+def frand(minval=0.0, maxval=1.0):
+    return random.uniform(minval, maxval)
+
+#seed random
+random.seed()
+
+#Get index
+#index = int(sys.argv[1])
+
+#Load last frame
+last_frame = iot.DLP2HReader(fileobj="HIk")[-1]
+
+#construct field file
+ff = ft.FieldCollection(input_file="FIELD_vdw_minus")
+for index, atom in enumerate(last_frame['element']):
+    if atom == "BI":
+        ff.append_molecule("FIELD_Mol_BI")
+    elif atom == "OI":
+        ff.append_molecule("FIELD_Mol_OI")
+    elif atom == "OH":
+        ff.append_molecule("FIELD_Mol_OH")
+    elif atom == "NN":
+        ff.append_molecule("FIELD_Mol_NO3")
+    elif atom == "SD":
+        ff.append_molecule("FIELD_Mol_DMSO")
+    elif atom == "OW":
+        ff.append_molecule("FIELD_Mol_H2O")
+
+field_out = open("FIELD", "w")
+field_out.write(str(ff))
+field_out.close()
+
+field_out = open("FIELD5", "w")
+field_out.write(str(ff))
+field_out.close()
+
+conf_writer = iot.DLP2CWriter(fileobj="CONFIG", overwrite=True)
+conf_writer.write(last_frame)
+del conf_writer
+
+conf_writer = iot.DLP2CWriter(fileobj="CONFIG5", overwrite=True)
+conf_writer.write(last_frame)
+del conf_writer
+
+#start step2
