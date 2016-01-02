@@ -94,4 +94,6 @@ conf_writer = iot.DLP2CWriter(fileobj="CONFIG1", overwrite=True)
 conf_writer.write(new_cluster)
 del conf_writer
 
+os.system("cp CONTROL1 CONTROL")
+os.system("qsub -l nodes=5:ppn=40,walltime=4:00:00 -q work -N "step2" -W depend=afterany:${PBS_JOBID} ./Step2")
 #start step2
