@@ -1,7 +1,10 @@
-#!/bin/bash
+#!/bin/bash -lx
 
-module load intel64 openmpi
+module load intelmpi
+module load intel64
+cd ${PBS_O_WORKDIR}
 
-# call DLPOLY here
+qsub -l nodes=2:ppn=40,walltime=0:30:00 -q work -N "step2" -W depend=afterany:${PBS_JOBID}
+mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X &
 
 # call step3
