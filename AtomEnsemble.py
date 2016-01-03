@@ -107,17 +107,20 @@ class AtomEnsemble(col.MutableSequence):
 
     def __getitem__(self, num):
         """Get rich copy"""
-        rt = self.copy()
+
         if type(num) == str:
             ra = xrange(len(self.main_list))
             return [v for a in ra for k, v in self.main_list[a].items() if k is num]
         if type(num) == int:
+            rt = self.copy()
             rt.main_list = rt.main_list[num]
             return rt
         elif type(num) == slice:
+            rt = self.copy()
             rt.main_list = rt.main_list[num]
             return rt
         elif type(num) == list:
+            rt = self.copy()
             rt.main_list = [rt.__getitem__(a) for a in num]
             return rt
         else:
