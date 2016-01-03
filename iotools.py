@@ -393,14 +393,22 @@ class DLP2CWriter(Writer):
             self.filehandle.write("\n{0:20.12f}{1:20.12f}{1:20.12f}\n{1:20.12f}{0:20.12f}{1:20.12f}\n{1:20.12f}{1:20.12f}{0:20.12f}".format(frame.boxvector, 0.0))
 
     def _write_main(self, frame=None):
+        co = frame['coordinate']
+        if 'velocity' in frame:
+            vel = frame['velocity']
+        if 'force' in frame:
+            fo = frame['force']
 
         for i in xrange(len(frame['element'])):
             self.filehandle.write('\n{0:8s}{1:10d}'.format(frame['element'][i], i+1))
-            self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(frame['coordinate'][i][0], frame['coordinate'][i][1], frame['coordinate'][i][2]))
+            #co = frame['coordinate'][i]
+            self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(co[i][0], co[i][1], co[i][2]))
 
             if 'velocity' in frame:
-                self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(frame['velocity'][i][0], frame['velocity'][i][1], frame['velocity'][i][2]))
+                #vel = frame['velocity'][i]
+                self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(vel[i][0], vel[i][1], vel[i][2]))
             else:
                 continue
             if 'force' in frame:
-                self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(frame['force'][i][0], frame['force'][i][1], frame['force'][i][2]))
+                #fo = frame['force'][i]
+                self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(fo[i][0], fo[i][1], fo[i][2]))
