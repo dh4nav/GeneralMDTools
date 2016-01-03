@@ -291,9 +291,9 @@ class Writer(object):
     def __init__(self, fileobj=None, overwrite=False):
         if type(fileobj) == str:
             if overwrite:
-                self.filehandle = open(fileobj, "w", 0)
+                self.filehandle = open(fileobj, "w") #, 0)
             else:
-                self.filehandle = open(fileobj, "a", 0)
+                self.filehandle = open(fileobj, "a") #, 0)
         elif type(fileobj) == file:
             self.filehandle = fileobj
 
