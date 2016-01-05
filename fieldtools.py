@@ -123,12 +123,12 @@ class FieldCollection(object):
                     for _ in range(int(lenlist[0])):
                         self.itemlist[-1].fields.append(vdw_special(self.read_next()))
 
-                #
-                # else:
-                #     line = f.readline.strip().split()
-                #     typelist.append(line[0].lower())
-                #     lenlist.append(int(line[1]))
-
+                elif typelist[0] == 'extern':
+                    #print "v"
+                    self.itemlist.append(extern(), self.read_next().strip())
+                    #for _ in range(int(lenlist[0])-1):
+                    #for now just read one line
+                    self.itemlist[-1].read(self.read_next())
 
     def __str__(self):
         returnstring = [self.title.strip()]
@@ -346,7 +346,6 @@ class vdws(object):
                 outstring.append(e.__str__())
 
         outstring = ["vdw " + str(len(outstring))] + outstring
-        outstring = outstring + ["extern","sphr","1000 100 2 20","close"]
 
         return "\n".join(outstring)
 
@@ -384,3 +383,24 @@ class vdw_special(object):
         out.append(self.key)
         out.extend(self.variables)
         return " ".join(out)
+
+class extern(object):
+    def __init__(self, exttype=""):
+        self.externtype = exttype
+        self.fields = []
+
+    def read(self, data):
+        el = data.strip().split()
+        self.fields.append([])
+        for e in el:
+            self.fields[-1].append(float(e))
+
+    def __str__(self):
+        outstring = ["extern", self.externtype]
+        for e in self.fields:
+            outline = []
+            for f in e:
+                outline += str(f)
+            outstring.append(" ".join(outline))
+
+        return "\n".join(outstring)
