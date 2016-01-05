@@ -91,5 +91,5 @@ else:
     conf_writer.write(last_frame)
     del conf_writer
 
-    os.system('cp CONTROL3 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -q work -N step5 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step5')
+    os.system('cp CONTROL3 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step5 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step5')
     # start 4
