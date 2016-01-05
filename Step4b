@@ -4,7 +4,7 @@ module load intelmpi
 module load intel64
 cd ${PBS_O_WORKDIR}
 
-qsub -l nodes=2:ppn=40,walltime=0:30:00 -q work -N step4 -W depend=afterany:${PBS_JOBID} /home/hpc/bca1/bca109/bin/GeneralMDTools/Step4
+qsub -l nodes=2:ppn=40,walltime=0:30:00 -N step4 -W depend=afterany:${PBS_JOBID} /home/hpc/bca1/bca109/bin/GeneralMDTools/Step4
 
 mv REVCON CONFIG
 mv REVIVE REVOLD
