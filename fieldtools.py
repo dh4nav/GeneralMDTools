@@ -346,6 +346,7 @@ class vdws(object):
                 outstring.append(e.__str__())
 
         outstring = ["vdw " + str(len(outstring))] + outstring
+        outstring = outstring + ["extern","sphr","1000 100 2 20","close"]
 
         return "\n".join(outstring)
 
