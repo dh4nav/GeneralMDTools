@@ -8,6 +8,9 @@ sys.path.extend(["/home/hpc/bca1/bca109/bin/GeneralMDTools", "/home/t/Source/Gen
 #import AtomEnsemble as ae
 
 import os
+
+os.chdir(os.environ['PBS_O_WORKDIR'])
+
 #import sys
 import fieldtools as ft
 import iotools as iot
@@ -32,7 +35,7 @@ lf_copy.filter(keep="BI")
 if lf_copy.get_chains("BI") != 1:
     os.system("mv REVCON CONFIG; mv REVIVE REVOLD")
     # start step2
-    os.system('cp CONTROL1R CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -q work -N step2 -W depend=afterany:${PBS_JOBID} /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2')
+    os.system('cp CONTROL1R CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -q work -N step2 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2')
 else:
     solvate_hull = iot.DLP2HReader(fileobj="SolvateHull")[0]
     len_last_frame = len(last_frame['element'])
@@ -88,5 +91,5 @@ else:
     conf_writer.write(last_frame)
     del conf_writer
 
-    os.system('cp CONTROL3 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -q work -N step5 -W depend=afterany:${PBS_JOBID} /home/hpc/bca1/bca109/bin/GeneralMDTools/Step5')
+    os.system('cp CONTROL3 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -q work -N step5 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step5')
     # start 4

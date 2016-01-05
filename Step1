@@ -5,7 +5,7 @@ sys.path.extend(["/home/hpc/bca1/bca109/bin/GeneralMDTools", "/home/t/Source/Gen
 
 import os
 
-os.chdir(os.getenv('PBS_O_WORKDIR', '.') 
+os.chdir(os.environ['PBS_O_WORKDIR'])
 
 import fieldtools as ft
 import iotools as iot
@@ -104,5 +104,5 @@ del conf_writer
 
 os.system("cp CONTROL1 CONTROL")
 os.system("mv OUTPUT OUTPUT1; mv HISTORY HISTORY1;mv STATIS STATIS1")
-os.system("qsub -l nodes=5:ppn=40,walltime=4:00:00 -q work -N step2 -W depend=afterany:${PBS_JOBID} /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2")
+os.system("qsub -l nodes=5:ppn=40,walltime=4:00:00 -q work -N step2 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2")
 #start step2
