@@ -251,6 +251,7 @@ class DLP2HReader(Reader):
 
             for i in xrange(frame_length):
                 line = self.filehandle.readline()
+                print line
                 if len(line) == 0:
                     raise EOFError
                 elements = line.strip().split()
