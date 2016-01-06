@@ -56,14 +56,14 @@ if 'force' in add_cluster:
 add_cluster.rotate_around_origin(frand(maxval=360.0), frand(maxval=360.0),
                                  frand(maxval=360.0), degrees=True)
 
-movevect = add_cluster.rotate_vector_around_origin([lf_radius+100.0, 0.0, 0.0],
+movevect = add_cluster.rotate_vector_around_origin([lf_radius+20.0, 0.0, 0.0],
                                                    frand(maxval=360.0),
                                                    frand(maxval=360.0),
                                                    frand(maxval=360.0),
                                                    degrees=True)
 
 add_cluster.move(movevect)
-add_cluster.accellerate(magnitude=-100.001, direction=movevect)
+#add_cluster.accellerate(magnitude=-100.001, direction=movevect)
 
 #Join clusters
 new_cluster = last_frame + add_cluster
@@ -117,7 +117,7 @@ conf_writer = iot.DLP2CWriter(fileobj="CONFIG1", overwrite=True)
 conf_writer.write(new_cluster)
 del conf_writer
 
-os.system("cp CONTROL1 CONTROL")
-os.system("mv OUTPUT OUTPUT1; mv HISTORY HISTORY1;mv STATIS STATIS1")
-os.system("qsub -l nodes=5:ppn=40,walltime=1:00:00 -N step2 -W depend=afterany:"+ os.environ['PBS_JOBID'] + " /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2")
+#os.system("cp CONTROL1 CONTROL")
+#os.system("mv OUTPUT OUTPUT1; mv HISTORY HISTORY1;mv STATIS STATIS1")
+#os.system("qsub -l nodes=5:ppn=40,walltime=1:00:00 -N step2 -W depend=afterany:"+ os.environ['PBS_JOBID'] + " /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2")
 #start step2

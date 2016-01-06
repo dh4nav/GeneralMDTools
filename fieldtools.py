@@ -28,8 +28,8 @@ class FieldCollection(object):
         if input_file:
             with open(input_file) as f:
                 self.read_init(f)
-            typelist = []
-            lenlist = []
+            typelist = [""]
+            lenlist = [0]
 
             while True:
                 # elements = self.read_next().split()
@@ -107,25 +107,31 @@ class FieldCollection(object):
             while True:
                 elements = self.read_next().split()
 
+                print elements
+
                 if elements[0].lower() == "close":
                     break
 
                 typelist.append(elements[0].lower())
-                lenlist.append(elements[1])
+                if len(elements) > 1: 
+                    lenlist.append(elements[1])
 
-                if typelist[0] == "molecules":
+                if typelist[-1] == "molecules":
                     self.itemlist.append(MoleculeCollection())
                     self.append_molecule(input_file, nummols=int(elements[1]))
+                    print "m"
 
-                elif typelist[0] == 'vdw':
+                elif typelist[-1] == 'vdw':
                     #print "v"
                     self.itemlist.append(vdws())
                     for _ in range(int(lenlist[0])):
                         self.itemlist[-1].fields.append(vdw_special(self.read_next()))
+                    print "v"
 
-                elif typelist[0] == 'extern':
-                    #print "v"
-                    self.itemlist.append(extern(), self.read_next().strip())
+
+                elif typelist[-1] == 'extern':
+                    print "e"
+                    self.itemlist.append(extern(self.read_next()))
                     #for _ in range(int(lenlist[0])-1):
                     #for now just read one line
                     self.itemlist[-1].read(self.read_next())
@@ -390,17 +396,20 @@ class extern(object):
         self.fields = []
 
     def read(self, data):
-        el = data.strip().split()
-        self.fields.append([])
-        for e in el:
-            self.fields[-1].append(float(e))
+        self.fields.append(data)
+        #el = data.strip().split()
+        #print "el"
+        #print el
+        #self.fields.append([])
+        #for e in el:
+        #    self.fields[-1].append(float(e))
 
     def __str__(self):
         outstring = ["extern", self.externtype]
         for e in self.fields:
-            outline = []
-            for f in e:
-                outline += str(f)
-            outstring.append(" ".join(outline))
+            #outline = []
+            #for f in e:
+            #    outline += str(f)
+            outstring.append(e) #" ".join(outline))
 
         return "\n".join(outstring)
