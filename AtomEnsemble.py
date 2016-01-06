@@ -291,7 +291,9 @@ class AtomEnsemble(col.MutableSequence):
             center_coordinates = np.array(center_coordinates)
         else:
             center_coordinates = self.get_center()
-        self['coordinate'] = np.subtract(np.array(self['coordinate']), center_coordinates)
+        print "C1" + str(self.get_center())
+        self['coordinate'] = self.move(-1.0 * center_coordinates)
+        print "C2" + str(self.get_center())
 
     def move(self, coords):
         self['coordinate'] = np.add(np.array(self['coordinate']), np.array(coords))
