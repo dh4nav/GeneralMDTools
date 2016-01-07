@@ -32,7 +32,7 @@ lf_copy = last_frame.copy()
 lf_copy.filter(keep="BI")
 
 # check if aggregation has occurred. If yes solvate, if not rinse and repeat
-if lf_copy.get_chains("BI", dist=9.0) != 1:
+if lf_copy.get_chains("BI", dist=3.0) != 1:
     os.system("mv REVCON CONFIG; mv REVIVE REVOLD")
     # start step2
     os.system('cp CONTROL1R CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00  -N step2 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2')
