@@ -72,6 +72,7 @@ movevect = minvect
 
 while (last_frame + add_cluster).get_chains() != 1:
     add_cluster.move(magnitude=0.1, direction=movevect)
+    print "Move in center: " + str(add_cluster.get_center())
 
 #Join clusters
 new_cluster = last_frame + add_cluster
