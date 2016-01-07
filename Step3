@@ -38,7 +38,7 @@ else:
     solvate_hull = iot.DLP2HReader(fileobj="SolvateHull")[0]
     len_last_frame = len(last_frame['element'])
     last_frame.center()
-    solvate_hull.center()
+    #solvate_hull.center()
     last_frame.intersect_molecules(solvate_hull, 3.5, 4)
 
     #construct field file
@@ -79,7 +79,7 @@ else:
     field_out.write(str(ff))
     field_out.close()
 
-    last_frame.boxvector = last_frame.get_bounding_box()
+    last_frame.boxvector = solvate_hull.boxvector
 
     conf_writer = iot.DLP2CWriter(fileobj="CONFIG", overwrite=True)
     conf_writer.write(last_frame)
