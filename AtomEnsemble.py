@@ -292,24 +292,24 @@ class AtomEnsemble(col.MutableSequence):
         else:
             center_coordinates = self.get_center()
         print "C1" + str(self.get_center())
-        self['coordinate'] = self.move(-1.0 * center_coordinates)
+        self.move(-1.0 * center_coordinates)
         print "C2" + str(self.get_center())
 
     def move(self, movevect=None, magnitude=None, direction=None):
-        if movevect == None:
-            if magnitude == None:
+        if type(movevect) == type(None):
+            if type(magnitude) == type(None):
                 magnitude = 1.0
-            if direction == None:
+            if type(direction) == type(None):
                 direction = [0.0, 0.0, 0.0]
             movevect = np.divide(np.array(direction), np.linalg.norm(direction))
             movevect = np.multiply(movevect, magnitude)
         self['coordinate'] = np.add(np.array(self['coordinate']), np.array(movevect))
 
     def accellerate(self, accvect=None, magnitude=None, direction=None, zero=True):
-        if accvect == None:
-            if magnitude == None:
+        if type(accvect) == type(None):
+            if type(magnitude) == type(None):
                 magnitude = 1.0
-            if direction == None:
+            if type(direction) == type(None):
                 direction = [0.0, 0.0, 0.0]
             accvect = np.divide(np.array(direction), np.linalg.norm(direction))
             accvect = np.multiply(accvect, magnitude)
