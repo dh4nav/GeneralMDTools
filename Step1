@@ -26,7 +26,7 @@ last_frame = iot.DLP2HReader(fileobj="HISTORY")[-1]
 
 
 #Load add cluster
-add_cluster = iot.XYZReader(fileobj="AddCluster.xyz")[-1]
+add_cluster = iot.DLP2HReader(fileobj="AddCluster")[-1]
 
 #Prepare last frame
 last_frame.filter(remove=["SD", "CD", "OD"])
@@ -37,7 +37,7 @@ if 'velocity' not in last_frame:
 if 'force' in last_frame:
     try:
         del last_frame['force']
-    except:
+    except KeyError:
         pass
 
 lf_radius = last_frame.get_enclosing_radius()
@@ -50,13 +50,13 @@ if 'velocity' not in add_cluster:
 if 'force' in add_cluster:
     try:
         del add_cluster['force']
-    except:
+    except KeyError:
         pass
 
 add_cluster.rotate_around_origin(frand(maxval=360.0), frand(maxval=360.0),
                                  frand(maxval=360.0), degrees=True)
 
-movevect = add_cluster.rotate_vector_around_origin([lf_radius+20.0, 0.0, 0.0],
+movevect = add_cluster.rotate_vector_around_origin([lf_radius+100.0, 0.0, 0.0],
                                                    frand(maxval=360.0),
                                                    frand(maxval=360.0),
                                                    frand(maxval=360.0),
@@ -64,6 +64,10 @@ movevect = add_cluster.rotate_vector_around_origin([lf_radius+20.0, 0.0, 0.0],
 
 add_cluster.move(movevect)
 #add_cluster.accellerate(magnitude=-100.001, direction=movevect)
+
+movevect = movevect * -1.0
+while (last_frame + add_cluster).get_chains() != 1:
+    add_cluster.move(magnitude=0.1, direction=movevect)
 
 #Join clusters
 new_cluster = last_frame + add_cluster
