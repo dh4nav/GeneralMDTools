@@ -10,7 +10,7 @@ os.chdir(os.environ['PBS_O_WORKDIR'])
 import fieldtools as ft
 import iotools as iot
 import random
-#import numpy as np
+import numpy as np
 
 def frand(minval=0.0, maxval=1.0):
     return random.uniform(minval, maxval)
@@ -31,6 +31,7 @@ add_cluster = iot.DLP2HReader(fileobj="AddCluster")[-1]
 #Prepare last frame
 last_frame.filter(remove=["SD", "CD", "OD"])
 last_frame.center()
+print "LFC" + str(last_frame.get_center())
 if 'velocity' not in last_frame:
     last_frame['velocity'] = [[0.0, 0.0, 0.0]] * len(last_frame['element'])
 
@@ -65,10 +66,7 @@ movevect = add_cluster.rotate_vector_around_origin([lf_radius+100.0, 0.0, 0.0],
 add_cluster.move(movevect)
 #add_cluster.accellerate(magnitude=-100.001, direction=movevect)
 
-minvect = []
-for m in movevect:
-    minvect.append(m * -1.0)
-movevect = minvect
+mag = -1.0 * np.linalg.norm(movevect)
 
 while (last_frame + add_cluster).get_chains() != 1:
     add_cluster.move(magnitude=0.1, direction=movevect)
