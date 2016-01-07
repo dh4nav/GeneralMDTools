@@ -68,9 +68,16 @@ add_cluster.move(movevect)
 
 mag = -1.0 * np.linalg.norm(movevect)
 
-while (last_frame + add_cluster).get_chains() != 1:
-    add_cluster.move(magnitude=0.1, direction=movevect)
+test_cluster = last_frame + add_cluster
+
+while test_cluster.get_chains(dist=4.0) != 1:
+    print "TC" + str(test_cluster.get_chains(dist=4.0))
+    test_cluster = last_frame + add_cluster
+    add_cluster.move(magnitude=-0.1, direction=movevect)
     print "Move in center: " + str(add_cluster.get_center())
+
+print "TC" + str(test_cluster.get_chains(dist=4.0))
+print "Move in center: " + str(add_cluster.get_center())
 
 #Join clusters
 new_cluster = last_frame + add_cluster
@@ -124,7 +131,7 @@ conf_writer = iot.DLP2CWriter(fileobj="CONFIG1", overwrite=True)
 conf_writer.write(new_cluster)
 del conf_writer
 
-#os.system("cp CONTROL1 CONTROL")
-#os.system("mv OUTPUT OUTPUT1; mv HISTORY HISTORY1;mv STATIS STATIS1")
-#os.system("qsub -l nodes=5:ppn=40,walltime=1:00:00 -N step2 -W depend=afterany:"+ os.environ['PBS_JOBID'] + " /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2")
+os.system("cp CONTROL1 CONTROL")
+os.system("mv OUTPUT OUTPUT1; mv HISTORY HISTORY1;mv STATIS STATIS1")
+os.system("qsub -l nodes=5:ppn=40,walltime=1:00:00 -N step2 -W depend=afterany:"+ os.environ['PBS_JOBID'] + " /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2")
 #start step2
