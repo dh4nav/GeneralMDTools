@@ -461,7 +461,6 @@ class AtomEnsemble(col.MutableSequence):
         # on a position equivalent to the index in the filered lists
         translation_list_a = []
         translation_list_b = []
-
         for n, e in enumerate(self['element']):
             if e in species_a:
                 translation_list_a.append(n)
