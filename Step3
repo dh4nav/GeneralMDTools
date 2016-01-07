@@ -30,14 +30,36 @@ random.seed()
 last_frame = iot.DLP2HReader(fileobj="HISTORY")[-1]
 
 # check if aggregation has occurred. If yes solvate, if not rinse and repeat
-if last_frame.get_chains(dist=3.0) != 1:
+print "LFD" + str(last_frame.get_chains(dist=3.5))
+if last_frame.get_chains(dist=3.5) != 1:
     os.system("mv REVCON CONFIG; mv REVIVE REVOLD; mv HISTORY HISTORY2; mv OUTPUT OUTPUT2; mv STATIS STATIS2")
     # start step2
-    os.system('cp CONTROL1R CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00  -N step2 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2')
+    os.system('cp CONTROL1R CONTROL; qsub -l nodes=2:ppn=40,walltime=1:00:00  -N step2 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2')
 else:
     solvate_hull = iot.DLP2HReader(fileobj="SolvateHull")[0]
     len_last_frame = len(last_frame['element'])
     last_frame.center()
+
+    try:
+        del last_frame['velocity']
+    except KeyError:
+        pass
+
+    try:
+        del last_frame['force']
+    except KeyError:
+        pass
+
+    try:
+        del solvate_hull['velocity']
+    except KeyError:
+        pass
+
+    try:
+        del solvate_hull['force']
+    except KeyError:
+        pass
+
     #solvate_hull.center()
     last_frame.intersect_molecules(solvate_hull, 3.5, 4)
 
@@ -89,5 +111,5 @@ else:
     conf_writer.write(last_frame)
     del conf_writer
 
-    os.system('cp CONTROL3 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step5 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step5')
+    os.system('cp CONTROL3 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step4 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step4')
     # start 4
