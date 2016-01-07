@@ -65,7 +65,11 @@ movevect = add_cluster.rotate_vector_around_origin([lf_radius+100.0, 0.0, 0.0],
 add_cluster.move(movevect)
 #add_cluster.accellerate(magnitude=-100.001, direction=movevect)
 
-movevect = movevect * -1.0
+minvect = []
+for m in movevect:
+    minvect.append(m * -1.0)
+movevect = minvect
+
 while (last_frame + add_cluster).get_chains() != 1:
     add_cluster.move(magnitude=0.1, direction=movevect)
 
