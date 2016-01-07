@@ -295,20 +295,28 @@ class AtomEnsemble(col.MutableSequence):
         self['coordinate'] = self.move(-1.0 * center_coordinates)
         print "C2" + str(self.get_center())
 
-    def move(self, coords):
-        self['coordinate'] = np.add(np.array(self['coordinate']), np.array(coords))
+    def move(self, movevect=None, magnitude=None, direction=None):
+        if movevect == None:
+            if magnitude == None:
+                magnitude = 1.0
+            if direction == None:
+                direction = [0.0, 0.0, 0.0]
+            movevect = np.divide(np.array(direction), np.linalg.norm(direction))
+            movevect = np.multiply(movevect, magnitude)
+        self['coordinate'] = np.add(np.array(self['coordinate']), np.array(movevect))
 
-    def accellerate(self, magnitude=None, direction=None, zero=True):
-        if magnitude == None:
-            magnitude = 1.0
-        if direction == None:
-            direction = [0.0, 0.0, 0.0]
-        acc_vect = np.divide(np.array(direction), np.linalg.norm(direction))
-        acc_vect = np.multiply(acc_vect, magnitude)
+    def accellerate(self, accvect=None, magnitude=None, direction=None, zero=True):
+        if accvect == None:
+            if magnitude == None:
+                magnitude = 1.0
+            if direction == None:
+                direction = [0.0, 0.0, 0.0]
+            accvect = np.divide(np.array(direction), np.linalg.norm(direction))
+            accvect = np.multiply(accvect, magnitude)
         if zero:
-            self['velocity'] = [acc_vect] * len(self['element'])
+            self['velocity'] = [accvect] * len(self['element'])
         else:
-            self['velocity'] = np.add(np.array(self['velocity']), acc_vect)
+            self['velocity'] = np.add(np.array(self['velocity']), accvect)
 
     def get_center(self): #, weigh_by_mass=False):
         coords = np.array(self['coordinate'])
