@@ -38,28 +38,10 @@ else:
     for f in last_frame_reader:
         if len(f.get_approaches("OH", "HH", 1.5, 2.0)) != 0:
             # H Bridge
-if timecounter > run_length:
-    pass # rinse and repeat with step 1
-else:
-    for f in last_frame_reader:
-        if len(f.get_approaches("OH", "HH", 1.5, 2.0)) != 0:
-            # H Bridge
 
             with open("timecounter", "w") as f:
                 f.write("0") #reset time
-            os.system('qsub -l nodes=2:ppn=40,walltime=4:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step8')
-            exit()
-
-    with open("timecounter", "w") as f:
-        f.write(str(timecounter))
-
-    os.system("mv REVCON CONFIG; mv REVIVE REVOLD; mv CONTROL5R CONTROL; cat HISTORYX HISTORY > HISTORYX; rm HISTORY")
-    os.system('qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
-    #step6
-
-            with open("timecounter", "w") as f:
-                f.write("0") #reset time
-            os.system('qsub -l nodes=2:ppn=40,walltime=4:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step8')
+            os.system('qsub -l nodes=2:ppn=40,walltime=4:00:00 -N step8 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step8')
             exit()
 
     with open("timecounter", "w") as f:
