@@ -4,8 +4,8 @@ module load intelmpi
 module load intel64
 cd ${PBS_O_WORKDIR}
 
-qsub -l nodes=2:ppn=40,walltime=0:30:00 -N step5 -W depend=afterok:${PBS_JOBID} /home/hpc/bca1/bca109/bin/GeneralMDTools/Step5
-qsub -l nodes=2:ppn=40,walltime=0:30:00 -N step4b -W depend=afternotok:${PBS_JOBID} /home/hpc/bca1/bca109/bin/GeneralMDTools/Step4b
+qsub -l nodes=2:ppn=40,walltime=3:30:00 -N step5 -W depend=afterok:${PBS_JOBID} /home/hpc/bca1/bca109/bin/GeneralMDTools/Step5
+qsub -l nodes=2:ppn=40,walltime=1:00:00 -N step4b -W depend=afternotok:${PBS_JOBID} /home/hpc/bca1/bca109/bin/GeneralMDTools/Step4b
 mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X
 
 

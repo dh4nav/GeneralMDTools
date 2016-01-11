@@ -398,10 +398,11 @@ class AtomEnsemble(col.MutableSequence):
             if e < mindist:
                 dellist.extend(range(n-(n%mollen), n+mollen-((n%mollen))))
                 skipflag = True
-        #print dellist
+        print dellist
         for e in reversed(dellist):
             del o2[e]
         self += o2
+        print self['element']
 
     def get_chains(self, dist=2.0):
 
