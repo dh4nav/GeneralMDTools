@@ -64,7 +64,7 @@ else:
     last_frame.intersect_molecules(solvate_hull, 3.5, 4)
 
     #construct field file
-    ff = ft.FieldCollection(input_file="FIELD_vdw_minus")
+    ff = ft.FieldCollection(input_file="FIELD_vdw_plus")
     for index, atom in enumerate(last_frame['element']):
         if index < len_last_frame:
             if atom == "BI":
