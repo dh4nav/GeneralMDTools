@@ -24,7 +24,7 @@ random.seed()
 last_frame = iot.DLP2HReader(fileobj="HISTORY")[-1]
 
 #construct field file
-ff = ft.FieldCollection(input_file="FIELD_vdw_minus")
+ff = ft.FieldCollection(input_file="FIELD_vdw_plus")
 for index, atom in enumerate(last_frame['element']):
     if atom == "BI":
         ff.append_molecule("FIELD_Mol_BI")
