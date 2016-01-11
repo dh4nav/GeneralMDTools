@@ -107,9 +107,7 @@ else:
     conf_writer.write(last_frame)
     del conf_writer
 
-    conf_writer = iot.DLP2CWriter(fileobj="CONFIG3", overwrite=True)
-    conf_writer.write(last_frame)
-    del conf_writer
+    os.system("cp CONFIG CONFIG3")
 
     os.system('cp CONTROL3 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step4 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step4')
     # start 4
