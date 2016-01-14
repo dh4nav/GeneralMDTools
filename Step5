@@ -54,6 +54,6 @@ del conf_writer
 conf_writer = iot.DLP2CWriter(fileobj="CONFIG5", overwrite=True)
 conf_writer.write(last_frame)
 del conf_writer
-
-os.system('cp CONTROL5 CONTROL; mv HISTORY HISTORY5; qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
+os.system("mv OUTPUT OUTPUT5; mv HISTORY HISTORY5; mv STATIS STATIS5")
+os.system('cp CONTROL5 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
 #start step6
