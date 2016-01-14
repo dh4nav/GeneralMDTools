@@ -18,8 +18,8 @@ def frand(minval=0.0, maxval=1.0):
 #seed random
 random.seed()
 
-at.check_and_write_error(["HISTORY", "CONTROL5", "CONTROL5R"], postfix="step5_pre")
-at.check_and_move(["OUTPUT", "STATIS", "REVCON"], "step5_pre")
+at.check_and_write_error(["HISTORY", "CONTROL5", "CONTROL5R", "REVCON"], postfix="step5_pre")
+at.check_and_move(["OUTPUT", "STATIS"], "step5_pre")
 #Get index
 #index = int(sys.argv[1])
 
