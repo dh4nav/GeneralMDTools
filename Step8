@@ -5,6 +5,7 @@ sys.path.extend(["/home/hpc/bca1/bca109/bin/GeneralMDTools", "/home/t/Source/Gen
 
 #import AtomEnsemble as ae
 import os
+import automationtools as at
 os.chdir(os.environ['PBS_O_WORKDIR'])
 #import sys
 import fieldtools as ft
@@ -19,6 +20,8 @@ def frand(minval=0.0, maxval=1.0):
 
 #seed random
 random.seed()
+at.check_and_write_error(["HISTORY", "CONTROL5", "CONTROL5R"], postfix="step8_pre")
+at.check_and_move(["OUTPUT", "STATIS", "REVCON"], "step8_pre")
 
 def recurse_make_water(frame):
     pairs = frame.get_approaches("OH", "HH", 1.5, 2.0)
@@ -86,7 +89,8 @@ for f in last_frame_reader:
 
         os.system("rm timecounter")
         os.system("cp CONTROL8 CONTROL")
-        os.system("mv OUTPUT OUTPUT8; mv HISTORY HISTORY8; mv STATIS STATIS8")
+        at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "CONFIG"], "step8")
+        at.check_and_copy(["CONFIG"], "step8")
         os.system('qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2')
         exit()
 
