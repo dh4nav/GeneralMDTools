@@ -8,6 +8,7 @@ sys.path.extend(["/home/hpc/bca1/bca109/bin/GeneralMDTools", "/home/t/Source/Gen
 #import AtomEnsemble as ae
 
 import os
+import automationtools as at
 
 os.chdir(os.environ['PBS_O_WORKDIR'])
 
@@ -22,6 +23,9 @@ def frand(minval=0.0, maxval=1.0):
 
 #seed random
 random.seed()
+
+at.check_and_write_error(["HISTORY", "CONTROL3", "CONTROL3R"], postfix="step3_pre")
+at.check_and_move(["OUTPUT", "STATIS", "REVCON"], "step3_pre")
 
 #Get index
 #index = int(sys.argv[1])
@@ -107,7 +111,7 @@ else:
     conf_writer.write(last_frame)
     del conf_writer
 
-    os.system("cp CONFIG CONFIG3")
-    os.system("mv OUTPUT OUTPUT3; mv HISTORY HISTORY3; mv STATIS STATIS3")
+    at.check_and_move(["OUTPUT", "HISTORY", "STATIS"], "step3")
+    at.check_and_copy(["CONFIG"], "step3")
     os.system('cp CONTROL3 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step4 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step4')
     # start 4
