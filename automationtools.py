@@ -9,18 +9,19 @@ def move_and_timestamp_file(filenames, postfix=None, add_date=True, separator="_
 
     for fn in filenames:
         splitpath = os.path.split(fn)
+        spb1 = splitpath[1]
         if len(splitpath[1]) == 0:
             raise OSError
         else:
             if postfix != None:
-                splitpath[1] = splitpath[1] + separator + postfix
+                spb1 = spb1 + separator + postfix
             if add_date == True:
-                splitpath[1] = splitpath[1] + separator + datetime.datetime.isoformat(datetime.datetime.now())
+                spb1 = spb1 + separator + datetime.datetime.isoformat(datetime.datetime.now())
 
             if copy:
-                os.system("cp " + fn + " " + os.path.join(splitpath[0], splitpath[1]))
+                os.system("cp " + fn + " " + os.path.join(splitpath[0], spb1))
             else:
-                os.rename(fn, os.path.join(splitpath[0], splitpath[1]))
+                os.rename(fn, os.path.join(splitpath[0], spb1))
 
 
 
@@ -46,7 +47,7 @@ def check_and_copy(filenames, postfix=None):
         try:
             check_files_present(f)
         except OSError:
-            write_error_message("STOP", "Missing file: " + f)
+            write_error_message("STOP", "Missing file: " + f + " ; Postfix: " + postfix)
             return False
 
         move_and_timestamp_file(f, postfix=postfix, copy=True)
@@ -56,7 +57,7 @@ def check_and_move(filenames, postfix=None):
         try:
             check_files_present(f)
         except OSError:
-            write_error_message("STOP", "Missing file: " + f + "\nPostfix: " + postfix)
+            write_error_message("STOP", "Missing file: " + f + " ; Postfix: " + postfix)
             return False
 
         move_and_timestamp_file(f, postfix=postfix, copy=False)
