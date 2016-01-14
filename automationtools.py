@@ -2,7 +2,7 @@ import os
 import datetime
 #import shutil as su
 
-def move_and_timestamp_file(filenames, postfix=None, add_date=True, separator="_"):
+def move_and_timestamp_file(filenames, postfix=None, add_date=True, separator="_", copy=False):
 
     if type(filenames) != list:
         filenames = [filenames]
@@ -17,7 +17,10 @@ def move_and_timestamp_file(filenames, postfix=None, add_date=True, separator="_
             if add_date == True:
                 splitpath[1] = splitpath[1] + separator + datetime.datetime.isoformat(datetime.datetime.now())
 
-            os.rename(fn, os.path.join(splitpath[0], splitpath[1]))
+            if copy:
+                os.system("cp " + fn + " " + os.path.join(splitpath[0], splitpath[1]))
+            else:
+                os.rename(fn, os.path.join(splitpath[0], splitpath[1]))
 
 
 
@@ -38,4 +41,22 @@ def write_error_message(filename, error_message=None):
         else:
             of.write("\n")
 
-#def check_and_copy(filenames):
+def check_and_copy(filenames, postfix=None):
+    for f in filenames:
+        try:
+            check_files_present(f)
+        except OSError:
+            write_error_message("STOP", "Missing file: " + f)
+            return False
+
+        move_and_timestamp_file(f, postfix=postfix, copy=True)
+
+def check_and_move(filenames, postfix=None):
+    for f in filenames:
+        try:
+            check_files_present(f)
+        except OSError:
+            write_error_message("STOP", "Missing file: " + f + "\nPostfix: " + postfix)
+            return False
+
+        move_and_timestamp_file(f, postfix=postfix, copy=False)
