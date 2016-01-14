@@ -47,6 +47,7 @@ else:
     with open("timecounter", "w") as f:
         f.write(str(timecounter))
 
-    os.system("mv REVCON CONFIG; mv REVIVE REVOLD; mv CONTROL5R CONTROL; cat HISTORYX HISTORY > HISTORYX; rm HISTORY")
+    os.system("mv OUTPUT OUTPUT7; mv HISTORY HISTORY7; mv STATIS STATIS7")
+    os.system("mv REVCON CONFIG; mv REVIVE REVOLD; mv CONTROL5R CONTROL")
     os.system('qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
     #step6
