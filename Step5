@@ -50,13 +50,16 @@ field_out = open("FIELD5", "w")
 field_out.write(str(ff))
 field_out.close()
 
-conf_writer = iot.DLP2CWriter(fileobj="CONFIG", overwrite=True)
-conf_writer.write(last_frame)
-del conf_writer
+# conf_writer = iot.DLP2CWriter(fileobj="CONFIG", overwrite=True)
+# conf_writer.write(last_frame)
+# del conf_writer
+#
+# conf_writer = iot.DLP2CWriter(fileobj="CONFIG5", overwrite=True)
+# conf_writer.write(last_frame)
+# del conf_writer
 
-conf_writer = iot.DLP2CWriter(fileobj="CONFIG5", overwrite=True)
-conf_writer.write(last_frame)
-del conf_writer
+os.system("mv REVCON CONFIG")
+
 at.check_and_move(["OUTPUT", "HISTORY", "STATIS"], "step5")
 at.check_and_copy(["CONFIG"], "step5")
 os.system('cp CONTROL5 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
