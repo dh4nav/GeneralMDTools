@@ -51,7 +51,8 @@ def check_and_write_error(filenames, postfix=None):
                 write_error_message("STOP", "Missing file: " + f + " ; Postfix: " + postfix)
             else:
                 write_error_message("STOP", "Missing file: " + f)
-            return False
+            #return False
+            continue
 
 def check_and_copy(filenames, postfix=None):
     for f in filenames:
@@ -63,6 +64,7 @@ def check_and_copy(filenames, postfix=None):
             else:
                 write_error_message("STOP", "Missing file: " + f)
             #return False
+            continue
 
         move_and_timestamp_file(f, postfix=postfix, copy=True)
 
@@ -76,5 +78,5 @@ def check_and_move(filenames, postfix=None):
             else:
                 write_error_message("STOP", "Missing file: " + f)
             #return False
-
+            continue
         move_and_timestamp_file(f, postfix=postfix, copy=False)
