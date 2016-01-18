@@ -226,7 +226,8 @@ class DLP2HReader(Reader):
         return self.framelength
 
     def _get_frame(self, seek=None, frame_length=None, marker=None, frame_number=None):
-
+        print "gf"
+        print self.frameindex
         #seek if specified
         if seek != None:
             self.filehandle.seek(seek)
@@ -235,6 +236,7 @@ class DLP2HReader(Reader):
             self.filehandle.seek(self.frameindex[frame_number])
 
         #read frame_length lines if specified and return position
+        print frame_length
         if frame_length != None:
             atomproperties = dict()
             ensemble = ae.AtomEnsemble()
