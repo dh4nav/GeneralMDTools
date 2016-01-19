@@ -111,7 +111,7 @@ else:
     conf_writer.write(last_frame)
     del conf_writer
 
-    at.check_and_move(["OUTPUT", "HISTORY", "STATIS"], "step3")
+    at.check_and_move(["HISTORY"], "step3")
     at.check_and_copy(["CONFIG"], "step3")
     os.system('cp CONTROL3 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step4 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step4')
     # start 4
