@@ -20,8 +20,10 @@ def move_and_timestamp_file(filenames, postfix=None, add_date=True, separator="_
 
             if copy:
                 os.system("cp " + fn + " " + os.path.join(splitpath[0], spb1))
+                print "cp " + fn + " " + os.path.join(splitpath[0], spb1)
             else:
                 os.rename(fn, os.path.join(splitpath[0], spb1))
+                print "mv " + fn + " " + os.path.join(splitpath[0], spb1)
 
 
 
