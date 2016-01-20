@@ -22,7 +22,7 @@ def frand(minval=0.0, maxval=1.0):
 #seed random
 random.seed()
 at.check_and_write_error(["HISTORY", "CONTROL5", "CONTROL5R"], postfix="step7_pre")
-at.check_and_move(["OUTPUT", "STATIS", "REVCON"], "step7_pre")
+#at.check_and_move(["OUTPUT", "STATIS", "REVCON"], "step7_pre")
 
 #Get index
 #index = int(sys.argv[1])
@@ -37,7 +37,7 @@ if os.path.isfile("timecounter"):
         timecounter += str(f.readline().strip())
 
 if timecounter > run_length:
-    pass # rinse and repeat with step 1
+    os.system("touch END") # rinse and repeat with step 1
 else:
     for f in last_frame_reader:
         if len(f.get_approaches("OH", "HH", 1.5, 2.0)) != 0:
