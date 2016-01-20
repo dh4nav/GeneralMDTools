@@ -16,6 +16,18 @@ class Reader(object):
         self.framelength = 0
         self.frameindex = {0: 0}
         self.frameindex_complete = False
+        self.n = 0
+
+    def __iter__(self):
+        self.n = 0
+        return self
+
+    def next(self):
+        try:
+            return self.__getitem__(self.n)
+        except EOFError:
+            raise StopIteration
+        self.n += 1
 
     def __len__(self):
         if self.frameindex_complete == False:
@@ -33,7 +45,7 @@ class Reader(object):
             self.filehandle.seek(seek)
 
         #skip preamble if specified
-        if self.filehandle.tell() == 0:
+        if self.filehandle.tell() == self.frameindex[0]:
             if preamble_length != None:
                 for _ in xrange(preamble_length):
                     if len(self.filehandle.readline()) == 0:
@@ -124,6 +136,7 @@ class Reader(object):
             self._populate_frameindex()
             #last frame known
             return self._get_frame(seek=self.frameindex[len(self.frameindex) + framenum], frame_length=self.framelength)
+
 
     def _populate_frameindex(self):
         if self.frameindex_complete == False:
@@ -226,8 +239,7 @@ class DLP2HReader(Reader):
         return self.framelength
 
     def _get_frame(self, seek=None, frame_length=None, marker=None, frame_number=None):
-        print "gf"
-        print self.frameindex
+
         #seek if specified
         if seek != None:
             self.filehandle.seek(seek)
@@ -236,7 +248,6 @@ class DLP2HReader(Reader):
             self.filehandle.seek(self.frameindex[frame_number])
 
         #read frame_length lines if specified and return position
-        print frame_length
         if frame_length != None:
             atomproperties = dict()
             ensemble = ae.AtomEnsemble()
@@ -258,10 +269,16 @@ class DLP2HReader(Reader):
                 elements = line.strip().split()
                 atom_position = (i - atoms_start)%atom_length
                 if i == 0:
+                    if elements[0].strip() != 'timestep':
+                        if frame_number != None:
+                            zeropos = self.frameindex[frame_number-1]
+                            self.frameindex = {0:zeropos}
+                            print "HISTORY read reset"
+                            return self._get_frame(seek, frame_length, marker, frame_number)
+                        else:
+                            raise SyntaxError("Word timestep not found. Frame:" + str(frame_number) + ", Line:" + str(i))
                     ensemble.timestep = int(elements[1])
                     ensemble.time = float(elements[5])
-                    if elements[0].strip() != 'timestep':
-                        raise SyntaxError("Word timestep not found. Frame:" + str(frame_number) + ", Line:" + str(i))
                 elif self.periodic_key and (i < 4):
                     if i == 1:
                         ensemble.boxvector = float(elements[0])
