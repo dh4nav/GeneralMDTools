@@ -14,7 +14,7 @@ import iotools as iot
 import random
 #import numpy as np
 
-run_length = 2000 # number of simulation frames to run before we quit
+run_length = 2000000000 # number of simulation frames to run before we quit
 
 def frand(minval=0.0, maxval=1.0):
     return random.uniform(minval, maxval)
