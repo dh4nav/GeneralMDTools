@@ -60,10 +60,41 @@ if 'PBS_O_WORKDIR' in os.environ:
 # del conf_writer
 
 
-
-at.check_and_move(["OUTPUT", "HISTORY", "STATIS"], "step4")
-#at.check_and_copy(["CONFIG", "FIELD", "REVCON", "REVIVE"], "step4")
-os.system("mv REVCON CONFIG")
-os.system("mv REVIVE REVOLD")
-os.system('cp CONTROL5 CONTROL; qsub -l nodes=5:ppn=40,walltime=10:00:00 -N step5b -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step5b')
+os.system('qsub -l nodes=5:ppn=40,walltime=10:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
 #start step6
+
+os.system("cp FIELD_free FIELD")
+os.system("cp CONTROL5b1 CONTROL")
+at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE"], "step4")
+at.check_and_copy(["REVCON"], "step4")
+os.system("mv REVCON CONFIG")
+os.system("module load imtel64 intelmpi; mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X")
+
+os.system("cp CONTROL5b2 CONTROL")
+at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE"], "step5_1")
+at.check_and_copy(["REVCON"], "step5_1")
+os.system("mv REVCON CONFIG")
+os.system("module load imtel64 intelmpi; mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X")
+
+os.system("cp CONTROL5b3 CONTROL")
+at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE"], "step5_2")
+at.check_and_copy(["REVCON"], "step5_2")
+os.system("mv REVCON CONFIG")
+os.system("module load imtel64 intelmpi; mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X")
+
+os.system("cp CONTROL5b4 CONTROL")
+at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE"], "step5_3")
+at.check_and_copy(["REVCON"], "step5_3")
+os.system("mv REVCON CONFIG")
+os.system("module load imtel64 intelmpi; mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X")
+
+os.system("cp CONTROL5b5 CONTROL")
+at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE"], "step5_4")
+at.check_and_copy(["REVCON"], "step5_4")
+os.system("mv REVCON CONFIG")
+os.system("module load imtel64 intelmpi; mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X")
+
+os.system("cp CONTROL5 CONTROL")
+at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE"], "step5_5")
+at.check_and_copy(["REVCON"], "step5_5")
+os.system("mv REVCON CONFIG")
