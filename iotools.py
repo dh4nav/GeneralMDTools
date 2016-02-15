@@ -19,15 +19,19 @@ class Reader(object):
         self.n = 0
 
     def __iter__(self):
-        self.n = 0
+        self.n = -1
+        print "IterStart"
         return self
 
     def next(self):
+        self.n += 1
         try:
+            print "Iter " + str(self.n)
             return self.__getitem__(self.n)
         except EOFError:
             raise StopIteration
-        self.n += 1
+        #self.n += 1
+        #print "Iter " + str(self.n)
 
     def __len__(self):
         if self.frameindex_complete == False:
@@ -213,16 +217,25 @@ class DLP2HReader(Reader):
         line = self.filehandle.readline()
         if len(line) == 0:
             raise EOFError
-        self.header = line.strip()
 
-        line = self.filehandle.readline()
-        if len(line) == 0:
-            raise EOFError
-        elements = line.strip().split()
+        if "timestep" in line:
+            elements = line.strip().split()
+            self.trajectory_key = int(elements[3])
+            self.periodic_key = int(elements[4])
+            self.number_atoms = int(elements[2])
+            self.filehandle.seek(0)
 
-        self.trajectory_key = int(elements[0])
-        self.periodic_key = int(elements[1])
-        self.number_atoms = int(elements[2])
+        else:
+            self.header = line.strip()
+
+            line = self.filehandle.readline()
+            if len(line) == 0:
+                raise EOFError
+            elements = line.strip().split()
+
+            self.trajectory_key = int(elements[0])
+            self.periodic_key = int(elements[1])
+            self.number_atoms = int(elements[2])
 
         self.frameindex[0] = self.filehandle.tell()
 
