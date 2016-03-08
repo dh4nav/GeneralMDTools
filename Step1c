@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+
+import sys
+sys.path.extend(["/home/hpc/bca1/bca109/bin/GeneralMDTools", "/home/t/Source/GeneralMDTools"])
+
+#import AtomEnsemble as ae
+import os
+import os.path
+import automationtools as at
+
+if 'PBS_O_WORKDIR' in os.environ:
+    os.chdir(os.environ['PBS_O_WORKDIR'])
+
+
+
+if os.path.isfile("CONTROL1c"):
+    at.check_and_move(["HISTORY", "REVCON"], "step1b")
+    at.check_and_copy(["CONFIG", "FIELD", "REVIVE"], "step1b")
+    os.system("cp CONTROL1c CONTROL; mv REVCON CONFIG") #; cp FIELD-nosolv-all FIELD")
+    os.system("qsub -l nodes=5:ppn=40,walltime=3:00:00 -N step2 -W depend=afterany:"+ os.environ['PBS_JOBID'] + " /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2")
+else:
+    at.check_and_move(["REVCON"], "step1b")
+    at.check_and_copy(["CONFIG", "FIELD", "REVIVE", "HISTORY"], "step1b")
+    os.system("qsub -l nodes=5:ppn=40,walltime=3:00:00 -N step3jump -W depend=afterany:"+ os.environ['PBS_JOBID'] + " /home/hpc/bca1/bca109/bin/GeneralMDTools/Step3")

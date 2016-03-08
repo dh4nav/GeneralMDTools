@@ -64,8 +64,8 @@ for f in last_frame_reader:
         del config_minus_writer
         os.system("cp FIELD 8minus")
         #os.system("cp STATIS 8minus")
-        os.system("cp CONFIG8 8minus/CONFIG")
-        os.system("cp CONFIG8 8plus/CONFIG")
+        os.system("cp CONTROL8 8minus/CONTROL")
+        os.system("cp CONTROL8 8plus/CONTROL")
         os.system("cp shellstarter 8minus")
         os.system("cp shellstarter 8plus")
         recurse_make_water(f)

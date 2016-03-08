@@ -61,9 +61,9 @@ class FieldCollection(object):
                         elif elements[0] == "bonds":
                             for i in range(int(elements[1])):
                                 self.itemlist[molcol_index].molecules[-1].fields['bonds'].append(bond(input_file=self.read_next()))
-                        # elif elements[0] == "constraints":
-                        #     for i in range(int(elements[1])):
-                        #         self.itemlist[-1].molecules[-1].fields['constraints'].append(constraint(input_file=self.read_next()))
+                        elif elements[0] == "constraints":
+                            for i in range(int(elements[1])):
+                                self.itemlist[molcol_index].molecules[-1].fields['constraints'].append(constraint(input_file=self.read_next()))
                         # TODO add pmf
                         elif elements[0] == "angles":
                             for i in range(int(elements[1])):
@@ -76,10 +76,10 @@ class FieldCollection(object):
                                 self.itemlist[molcol_index].molecules[-1].fields['inversions'].append(inversion(input_file=self.read_next()))
                         # elif elements[0] == "rigid":
                         #     for i in range(int(elements[1])):
-                        #         self.itemlist[-1].molecules[-1].fields['rigid'].append(atom(input_file=self.read_next()))
+                        #         self.itemlist[molcol_index].molecules[-1].fields['rigid'].append(atom(input_file=self.read_next()))
                         # elif elements[0] == "teth":
                         #     for i in range(int(elements[1])):
-                        #         self.itemlist[-1].molecules[-1].fields['teth'].append(tether(input_file=self.read_next()))
+                        #         self.itemlist[molcol_index].molecules[-1].fields['teth'].append(tether(input_file=self.read_next()))
                         elif elements[0] == "finish":
                             return
                 typelist.pop()
@@ -113,7 +113,7 @@ class FieldCollection(object):
                     break
 
                 typelist.append(elements[0].lower())
-                if len(elements) > 1: 
+                if len(elements) > 1:
                     lenlist.append(elements[1])
 
                 if typelist[-1] == "molecules":
@@ -317,6 +317,11 @@ class dihedral(Molecule_Description_Item_Base):
 class inversion(Molecule_Description_Item_Base):
     def __init__(self, input_file=None):
         Molecule_Description_Item_Base.__init__(self, input_file=input_file, factory=['key', 'index1', 'index2', 'index3', 'index4'], minimum_items=5)
+
+class constraint(Molecule_Description_Item_Base):
+    def __init__(self, input_file=None):
+        Molecule_Description_Item_Base.__init__(self, input_file=input_file, factory=['index1', 'index2', 'dist'], minimum_items=3)
+
 
 # class rigid():
 #     def __init__(self, input_file=None):

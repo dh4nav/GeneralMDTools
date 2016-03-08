@@ -25,7 +25,7 @@ def frand(minval=0.0, maxval=1.0):
 random.seed()
 
 at.check_and_write_error(["HISTORY", "CONTROL3", "CONTROL3R"], postfix="step3_pre")
-at.check_and_move(["OUTPUT", "STATIS", "REVCON"], "step3_pre")
+at.check_and_move(["OUTPUT", "STATIS", "REVIVE"], "step2")
 
 #Get index
 #index = int(sys.argv[1])
@@ -36,9 +36,11 @@ last_frame = iot.DLP2HReader(fileobj="HISTORY")[-1]
 # check if aggregation has occurred. If yes solvate, if not rinse and repeat
 print "LFD" + str(last_frame.get_chains(dist=3.5))
 if last_frame.get_chains(dist=3.5) != 1:
-    os.system("mv REVCON CONFIG; mv REVIVE REVOLD; mv HISTORY HISTORY2; mv OUTPUT OUTPUT2; mv STATIS STATIS2")
+    at.check_and_move(["HISTORY"], "step2")
+    at.check_and_copy(["REVCON"])
+    os.system("mv REVCON CONFIG")
     # start step2
-    os.system('cp CONTROL1R CONTROL; qsub -l nodes=2:ppn=40,walltime=1:00:00  -N step2 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2')
+    os.system('cp CONTROL1R CONTROL; qsub -l nodes=2:ppn=40,walltime=2:00:00  -N step2 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step2')
 else:
     solvate_hull = iot.DLP2HReader(fileobj="SolvateHull")[0]
     len_last_frame = len(last_frame['element'])
@@ -101,7 +103,138 @@ else:
     field_out.write(str(ff))
     field_out.close()
 
-    field_out = open("FIELD3", "w")
+    os.system("cp FIELD FIELD_clusterfix")
+
+    ff = ft.FieldCollection(input_file="FIELD_vdw_plus")
+    for index, atom in enumerate(last_frame['element']):
+        if atom == "BI":
+            ff.append_molecule("FIELD_Mol_BI_fixed")
+        elif atom == "OI":
+            ff.append_molecule("FIELD_Mol_OI")
+        elif atom == "OH":
+            ff.append_molecule("FIELD_Mol_OH")
+        elif atom == "NN":
+            ff.append_molecule("FIELD_Mol_NO3")
+        elif atom == "SD":
+            ff.append_molecule("FIELD_Mol_DMSO")
+        elif atom == "OW":
+            ff.append_molecule("FIELD_Mol_H2O")
+
+    field_out = open("FIELD_BIfix", "w")
+    field_out.write(str(ff))
+    field_out.close()
+
+    ff = ft.FieldCollection(input_file="FIELD_vdw_plus")
+    for index, atom in enumerate(last_frame['element']):
+        if atom == "BI":
+            ff.append_molecule("FIELD_Mol_BI_fixed")
+        elif atom == "OI":
+            ff.append_molecule("FIELD_Mol_OI_fixed")
+        elif atom == "OH":
+            ff.append_molecule("FIELD_Mol_OH_fixed")
+        elif atom == "NN":
+            ff.append_molecule("FIELD_Mol_NO3")
+        elif atom == "SD":
+            ff.append_molecule("FIELD_Mol_DMSO")
+        elif atom == "OW":
+            ff.append_molecule("FIELD_Mol_H2O_fixed")
+
+    field_out = open("FIELD_BIOIOHOWfix", "w")
+    field_out.write(str(ff))
+    field_out.close()
+
+    ff = ft.FieldCollection(input_file="FIELD_vdw_plus")
+    for index, atom in enumerate(last_frame['element']):
+        if atom == "BI":
+            ff.append_molecule("FIELD_Mol_BI")
+        elif atom == "OI":
+            ff.append_molecule("FIELD_Mol_OI_fixed")
+        elif atom == "OH":
+            ff.append_molecule("FIELD_Mol_OH_fixed")
+        elif atom == "NN":
+            ff.append_molecule("FIELD_Mol_NO3")
+        elif atom == "SD":
+            ff.append_molecule("FIELD_Mol_DMSO")
+        elif atom == "OW":
+            ff.append_molecule("FIELD_Mol_H2O_fixed")
+
+    field_out = open("FIELD_OIOHOWfix", "w")
+    field_out.write(str(ff))
+    field_out.close()
+
+    ff = ft.FieldCollection(input_file="FIELD_vdw_plus")
+    for index, atom in enumerate(last_frame['element']):
+        if atom == "BI":
+            ff.append_molecule("FIELD_Mol_BI")
+        elif atom == "OI":
+            ff.append_molecule("FIELD_Mol_OI_fixed")
+        elif atom == "OH":
+            ff.append_molecule("FIELD_Mol_OH_fixed")
+        elif atom == "NN":
+            ff.append_molecule("FIELD_Mol_NO3_fixed")
+        elif atom == "SD":
+            ff.append_molecule("FIELD_Mol_DMSO_fixed")
+        elif atom == "OW":
+            ff.append_molecule("FIELD_Mol_H2O_fixed")
+
+    field_out = open("FIELD_OIOHOWNO3DMSOfix", "w")
+    field_out.write(str(ff))
+    field_out.close()
+
+    ff = ft.FieldCollection(input_file="FIELD_vdw_plus")
+    for index, atom in enumerate(last_frame['element']):
+        if atom == "BI":
+            ff.append_molecule("FIELD_Mol_BI_fixed")
+        elif atom == "OI":
+            ff.append_molecule("FIELD_Mol_OI")
+        elif atom == "OH":
+            ff.append_molecule("FIELD_Mol_OH")
+        elif atom == "NN":
+            ff.append_molecule("FIELD_Mol_NO3")
+        elif atom == "SD":
+            ff.append_molecule("FIELD_Mol_DMSO_fixed")
+        elif atom == "OW":
+            ff.append_molecule("FIELD_Mol_H2O")
+
+    field_out = open("FIELD_BIDMSOfix", "w")
+    field_out.write(str(ff))
+    field_out.close()
+
+    ff = ft.FieldCollection(input_file="FIELD_vdw_plus")
+    for index, atom in enumerate(last_frame['element']):
+        if atom == "BI":
+            ff.append_molecule("FIELD_Mol_BI")
+        elif atom == "OI":
+            ff.append_molecule("FIELD_Mol_OI")
+        elif atom == "OH":
+            ff.append_molecule("FIELD_Mol_OH")
+        elif atom == "NN":
+            ff.append_molecule("FIELD_Mol_NO3")
+        elif atom == "SD":
+            ff.append_molecule("FIELD_Mol_DMSO_fixed")
+        elif atom == "OW":
+            ff.append_molecule("FIELD_Mol_H2O")
+
+    field_out = open("FIELD_DMSOfix", "w")
+    field_out.write(str(ff))
+    field_out.close()
+
+    ff = ft.FieldCollection(input_file="FIELD_vdw_plus")
+    for index, atom in enumerate(last_frame['element']):
+        if atom == "BI":
+            ff.append_molecule("FIELD_Mol_BI")
+        elif atom == "OI":
+            ff.append_molecule("FIELD_Mol_OI")
+        elif atom == "OH":
+            ff.append_molecule("FIELD_Mol_OH")
+        elif atom == "NN":
+            ff.append_molecule("FIELD_Mol_NO3")
+        elif atom == "SD":
+            ff.append_molecule("FIELD_Mol_DMSO")
+        elif atom == "OW":
+            ff.append_molecule("FIELD_Mol_H2O")
+
+    field_out = open("FIELD_free", "w")
     field_out.write(str(ff))
     field_out.close()
 
@@ -111,7 +244,7 @@ else:
     conf_writer.write(last_frame)
     del conf_writer
 
-    at.check_and_move(["HISTORY"], "step3")
-    at.check_and_copy(["CONFIG"], "step3")
-    os.system('cp CONTROL3 CONTROL; qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step4 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step4')
+    at.check_and_move(["HISTORY"], "step2")
+    at.check_and_copy(["CONFIG", "FIELD"], "step3")
+    os.system('cp CONTROL3 CONTROL; qsub -l nodes=5:ppn=40,walltime=2:00:00 -N step4 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step4')
     # start 4

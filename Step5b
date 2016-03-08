@@ -6,13 +6,16 @@ cd ${PBS_O_WORKDIR}
 
 qsub -l nodes=5:ppn=40,walltime=5:00:00 -N step6 -W depend=afterany:${PBS_JOBID} /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6
 
+cp FIELD_DMSOfix FIELD
 cp CONTROL5b1 CONTROL
 mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X
 mv HISTORY HISTORY5b1
 mv OUTPUT OUTPUT5b1
 mv STATIS STATIS5b1
 
+
 mv REVCON CONFIG
+cp FIELD_BIfix FIELD
 cp CONTROL5b2 CONTROL
 mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X
 mv HISTORY HISTORY5b2
@@ -20,6 +23,7 @@ mv OUTPUT OUTPUT5b2
 mv STATIS STATIS5b2
 
 mv REVCON CONFIG
+cp FIELD_free FIELD
 cp CONTROL5b3 CONTROL
 mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X
 mv HISTORY HISTORY5b3
@@ -27,6 +31,7 @@ mv OUTPUT OUTPUT5b3
 mv STATIS STATIS5b3
 
 mv REVCON CONFIG
+cp FIELD_free FIELD
 cp CONTROL5b4 CONTROL
 mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X
 mv HISTORY HISTORY5b4
@@ -34,6 +39,7 @@ mv OUTPUT OUTPUT5b4
 mv STATIS STATIS5b4
 
 mv REVCON CONFIG
+cp FIELD_free FIELD
 cp CONTROL5b5 CONTROL
 mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X
 mv HISTORY HISTORY5b5

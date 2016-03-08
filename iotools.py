@@ -224,6 +224,7 @@ class DLP2HReader(Reader):
             self.periodic_key = int(elements[4])
             self.number_atoms = int(elements[2])
             self.filehandle.seek(0)
+            self.header = "No header"
 
         else:
             self.header = line.strip()

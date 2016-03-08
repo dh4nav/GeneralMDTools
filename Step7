@@ -9,50 +9,177 @@ import automationtools as at
 if 'PBS_O_WORKDIR' in os.environ:
     os.chdir(os.environ['PBS_O_WORKDIR'])
 #import sys
-#import fieldtools as ft
+import fieldtools as ft
 import iotools as iot
 import random
+
+import subprocess as sp
 #import numpy as np
 
-run_length = 2000000000 # number of simulation frames to run before we quit
+# from mpi4py import MPI
+# comm = MPI.COMM_WORLD
+# rank = comm.Get_rank()
+
+run_length = 20000000 # number of simulation frames to run before we quit
 
 def frand(minval=0.0, maxval=1.0):
     return random.uniform(minval, maxval)
 
-#seed random
-random.seed()
-at.check_and_write_error(["HISTORY", "CONTROL5", "CONTROL5R"], postfix="step7_pre")
-#at.check_and_move(["OUTPUT", "STATIS", "REVCON"], "step7_pre")
+def recurse_make_water(frame):
+    pairs = frame.get_approaches("OH", "HH", 1.5, 2.0)
+    if len(pairs) == 0:
+        return True
+    else:
+        o_pos = pairs[0][0]
+        h_pos = pairs[0][1]
 
-#Get index
-#index = int(sys.argv[1])
+        h = frame[h_pos].copy()
+        h['element'] = 'HW'
+        frame[h_pos-1]['element'] = 'OI'
+        frame[o_pos]['element'] = 'OW'
+        frame[o_pos+1]['element'] = 'HW'
+        frame.main_list.insert(o_pos+2, h)
+        del frame.main_list[h_pos]
 
-#Load last frame
-last_frame_reader = iot.DLP2HReader(fileobj="HISTORY")
-last_frame = last_frame_reader[-1]
+        #continue here if we ever need to fix the angles
+        #if o_pos > h_pos:
+        #    o_pos -= 1
+        #...
 
-timecounter = len(last_frame_reader)
-if os.path.isfile("timecounter"):
-    with open("timecounter") as f:
-        timecounter += str(f.readline().strip())
+        return recurse_make_water(frame)
 
-if timecounter > run_length:
-    os.system("touch END") # rinse and repeat with step 1
-else:
-    for f in last_frame_reader:
-        if len(f.get_approaches("OH", "HH", 1.5, 2.0)) != 0:
-            # H Bridge
+if 1: #rank == 0:
 
-            with open("timecounter", "w") as f:
-                f.write("0") #reset time
-            os.system('qsub -l nodes=2:ppn=40,walltime=4:00:00 -N step8 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step8')
-            exit()
+    #seed random
+    random.seed()
+    at.check_and_write_error(["HISTORY", "CONTROL5", "CONTROL5R"], postfix="step7_pre")
+    #at.check_and_move(["OUTPUT", "STATIS", "REVCON"], "step7_pre")
 
-    with open("timecounter", "w") as f:
-        f.write(str(timecounter))
+    #Get index
+    #index = int(sys.argv[1])
 
-    at.check_and_move(["OUTPUT", "HISTORY", "STATIS"], "step7")
-    at.check_and_copy(["CONFIG"], "step7")
-    os.system("mv REVCON CONFIG; mv REVIVE REVOLD; mv CONTROL5R CONTROL")
-    os.system('qsub -l nodes=5:ppn=40,walltime=4:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
-    #step6
+    #Load last frame
+    last_frame_reader = iot.DLP2HReader(fileobj="HISTORY")
+    last_frame = last_frame_reader[-1]
+
+    timecounter = 0
+    if os.path.isfile("timecounter"):
+        with open("timecounter") as f:
+            timecounter = int(f.readline().strip())
+
+    if timecounter > run_length:
+        os.system("touch END") # rinse and repeat with step 1
+    else:
+        for n, f in enumerate(last_frame_reader):
+            if n >= timecounter:
+                print n
+                f.filter(keep=["OH", "HH"])
+                applen = len(f.get_approaches("OH", "HH", 1.5, 2.0))
+                print "S " + str(n) + " " + str(applen)
+                if applen != 0:
+                    # H Bridge
+
+                    os.system("mkdir 8minus")
+                    os.system("mkdir 8plus")
+
+                    config_minus_writer = iot.DLP2CWriter(fileobj="8minus/CONFIG", overwrite=True)
+                    config_minus_writer.write(f)
+                    del config_minus_writer
+                    os.system("cp FIELD 8minus")
+                    #os.system("cp STATIS 8minus")
+                    os.system("cp CONTROL8 8minus/CONTROL")
+                    os.system("cp CONTROL8 8plus/CONTROL")
+                    os.system("cp shellstarter 8minus")
+                    os.system("cp shellstarter 8plus")
+                    recurse_make_water(f)
+
+                    ff = ft.FieldCollection(input_file="FIELD_vdw_plus")
+                    for index, atom in enumerate(f['element']):
+                        if atom == "BI":
+                            ff.append_molecule("FIELD_Mol_BI_fixed")
+                        elif atom == "OI":
+                            ff.append_molecule("FIELD_Mol_OI_fixed")
+                        elif atom == "OH":
+                            ff.append_molecule("FIELD_Mol_OH_fixed")
+                        elif atom == "NN":
+                            ff.append_molecule("FIELD_Mol_NO3_fixed")
+                        elif atom == "SD":
+                            ff.append_molecule("FIELD_Mol_DMSO_fixed")
+                        elif atom == "OW":
+                            ff.append_molecule("FIELD_Mol_H2O")
+
+                    field_out = open("8plus/FIELD", "w")
+                    field_out.write(str(ff))
+                    field_out.close()
+
+                    # field_out = open("FIELD8", "w")
+                    # field_out.write(str(ff))
+                    # field_out.close()
+
+                    conf_writer = iot.DLP2CWriter(fileobj="8plus/CONFIG", overwrite=True)
+                    conf_writer.write(f)
+                    del conf_writer
+
+                    os.chdir("8plus")
+                    sp.Popen("${PBS_O_WORKDIR}/shellstarter", shell=True, env=os.environ, stdout=sp.PIPE, stderr=sp.PIPE).communicate()
+                    os.chdir("8minus")
+                    sp.Popen("${PBS_O_WORKDIR}/shellstarter", shell=True, env=os.environ, stdout=sp.PIPE, stderr=sp.PIPE).communicate()
+
+                    stlplus = ""
+                    stlminus = ""
+
+                    with open("8minus/STO") as fminus:
+                        for stlminus in fminus:
+                            pass
+
+                    with open("8plus/STO") as fplus:
+                        for stlplus in fplus:
+                            pass
+
+                    eminus = float(stlminus.strip().split()[5])
+                    eplus = float(stlplus.strip().split()[5])
+
+                    if eminus > (eplus + 7.0):
+                        at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE", "CONFIG", "FIELD", "REVCON"], "step7++")
+                        os.system("mv 8plus/FIELD FIELD")
+                        os.system("mv 8plus/REVCON REVCON")
+                        os.system("rm -r 8plus 8minus")
+
+                        with open("timecounter", "w") as f:
+                            f.write("0") #reset time
+                        os.system('qsub -l nodes=10:ppn=40,walltime=4:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
+
+                        os.system("cp CONTROL5 CONTROL")
+                        exit()
+
+                    else:
+                        # os.system("mv 8minus/FIELD FIELD")
+                        # os.system("mv 8minus/REVCON REVCON")
+                        os.system("rm -r 8plus 8minus")
+                        at.check_and_move(["OUTPUT"], "step7+-")
+                        at.check_and_copy(["CONFIG", "FIELD", "REVCON", "REVIVE", "STATIS"], "step7+-")
+                        os.system("mv REVCON CONFIG; mv REVIVE REVOLD")
+                        os.system("cp CONTROL5R CONTROL")
+
+                        timecounter += len(last_frame_reader)
+                        with open("timecounter", "w") as f:
+                            f.write(str(timecounter))
+                        os.system('qsub -l nodes=10:ppn=40,walltime=4:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
+
+        timecounter += len(last_frame_reader)
+        with open("timecounter", "w") as f:
+            f.write(str(timecounter))
+
+        at.check_and_move(["OUTPUT", "STATIS", "HISTORY"], "step7-")
+        at.check_and_copy(["CONFIG", "FIELD", "REVCON"], "step7-")
+        os.system("mv REVCON CONFIG; mv REVIVE REVOLD")
+        os.system('qsub -l nodes=10:ppn=40,walltime=4:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
+        os.system("cp CONTROL5R CONTROL")
+        #step6
+
+# elif rank > 0:
+#     while 1:
+#         if comm.Iprobe(source=0, tag=1):
+#             data = comm.recv(source=0, tag=1)
+#
+#             comm.send(data, dest=0, tag=2)

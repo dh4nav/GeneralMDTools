@@ -6,6 +6,7 @@ sys.path.extend(["/home/hpc/bca1/bca109/bin/GeneralMDTools", "/home/t/Source/Gen
 #import AtomEnsemble as ae
 import os
 import automationtools as at
+import subprocess as sp
 if 'PBS_O_WORKDIR' in os.environ:
     os.chdir(os.environ['PBS_O_WORKDIR'])
 # import fieldtools as ft
@@ -60,7 +61,7 @@ if 'PBS_O_WORKDIR' in os.environ:
 # del conf_writer
 
 
-os.system('qsub -l nodes=5:ppn=40,walltime=10:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
+
 #start step6
 
 os.system("cp FIELD_free FIELD")
@@ -68,33 +69,35 @@ os.system("cp CONTROL5b1 CONTROL")
 at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE"], "step4")
 at.check_and_copy(["REVCON"], "step4")
 os.system("mv REVCON CONFIG")
-os.system("module load imtel64 intelmpi; mpirun_rrze -npernode 20 -pinexpr N:0-19 " + os.environ['HOME'] + " /dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X")
+sp.Popen("${PBS_O_WORKDIR}/shellstarter", shell=True, env=os.environ, stdout=sp.PIPE, stderr=sp.PIPE).communicate()
 
 os.system("cp CONTROL5b2 CONTROL")
 at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE"], "step5_1")
 at.check_and_copy(["REVCON"], "step5_1")
 os.system("mv REVCON CONFIG")
-os.system("module load imtel64 intelmpi; mpirun_rrze -npernode 20 -pinexpr N:0-19 " + os.environ['HOME'] + " /dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X")
+sp.Popen("${PBS_O_WORKDIR}/shellstarter", shell=True, env=os.environ, stdout=sp.PIPE, stderr=sp.PIPE).communicate()
 
 os.system("cp CONTROL5b3 CONTROL")
 at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE"], "step5_2")
 at.check_and_copy(["REVCON"], "step5_2")
 os.system("mv REVCON CONFIG")
-os.system("module load imtel64 intelmpi; mpirun_rrze -npernode 20 -pinexpr N:0-19 " + os.environ['HOME'] + " /dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X")
+sp.Popen("${PBS_O_WORKDIR}/shellstarter", shell=True, env=os.environ, stdout=sp.PIPE, stderr=sp.PIPE).communicate()
 
 os.system("cp CONTROL5b4 CONTROL")
 at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE"], "step5_3")
 at.check_and_copy(["REVCON"], "step5_3")
 os.system("mv REVCON CONFIG")
-os.system("module load imtel64 intelmpi; mpirun_rrze -npernode 20 -pinexpr N:0-19 " + os.environ['HOME'] + " /dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X")
+sp.Popen("${PBS_O_WORKDIR}/shellstarter", shell=True, env=os.environ, stdout=sp.PIPE, stderr=sp.PIPE).communicate()
 
 os.system("cp CONTROL5b5 CONTROL")
 at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE"], "step5_4")
 at.check_and_copy(["REVCON"], "step5_4")
 os.system("mv REVCON CONFIG")
-os.system("module load imtel64 intelmpi; mpirun_rrze -npernode 20 -pinexpr N:0-19 " + os.environ['HOME'] + " /dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X")
+sp.Popen("${PBS_O_WORKDIR}/shellstarter", shell=True, env=os.environ, stdout=sp.PIPE, stderr=sp.PIPE).communicate()
 
 os.system("cp CONTROL5 CONTROL")
 at.check_and_move(["OUTPUT", "HISTORY", "STATIS", "REVIVE"], "step5_5")
 at.check_and_copy(["REVCON"], "step5_5")
 os.system("mv REVCON CONFIG")
+
+os.system('qsub -l nodes=5:ppn=40,walltime=2:00:00 -N step6 -W depend=afterany:'+ os.environ['PBS_JOBID'] + ' /home/hpc/bca1/bca109/bin/GeneralMDTools/Step6')
