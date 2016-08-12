@@ -1,5 +1,5 @@
 #!/usr/bin/env python
- 
+
 # -*- coding: utf-8 *-*
 
 import os, sys
@@ -26,7 +26,7 @@ boxes = []
 timesteps = []
 comment = ""
 timestep = 0
-    
+
 linenum = -2
 
 if args.noheader:
@@ -47,10 +47,10 @@ lastelement = ""
 framecounter = 0
 
 inf = open(args.HISTORY, "r")
-opf = open(args.XYZ + ".xyz", "w")
+opf = open(args.XYZ, "w")
 try:
     for n,l in enumerate(inf):
-        
+
         if l.find("timestep") != -1:
             if args.verbose:
                 framecounter += 1

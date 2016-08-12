@@ -1,5 +1,5 @@
 
-import os
+import os, sys
 import datetime
 import ConfigParser
 #import shutil as su
@@ -114,13 +114,30 @@ def mod_parameters(filename_source, filename_target, parameters, modifications, 
 
     if len(parameters):
         for index, action in enumerate(actions):
-            if (action is "ADD") or (action is "ADDREPLACE"):
+            if (action == "ADD") | (action == "ADDREPLACE"):
                 outfilehandle.write(modifications[index]+"\n")
 
 def mangle_config(configfile, group):
-    cp = ConfigParser.GlobalConfigParser()
+    cp = GlobalConfigParser()
     cp.read(configfile)
-    cpitems = cp.get(group, "control_changes")
+    print "R0"
+
+    if os.path.isfile(group+"R"):
+        cpitems = cp.get(group, "control_changes_restart")
+        os.system("mv REVCON CONFIG; mv REVIVE REVOLD")
+        print "R1"
+    else:
+        cpitems = cp.get(group, "control_changes")
+        if cp.has_option(group, "use_revcon"):
+            os.system("mv REVCON CONFIG")
+            print "R2"
+        if cp.has_option(group, "control_changes_restart"):
+            os.system("touch " + group + "R")
+            print "R3"
+
+    print "-+-"
+    print cpitems
+
     params = ["finish"]
     mods = [""]
     acts = ["REMOVE"]
@@ -143,7 +160,7 @@ def mangle_config(configfile, group):
     mod_parameters(cp.get(group, "control_source"), cp.get(group, "control_target"), params, mods, acts)
 
 def pbs_runner(configfile, group):
-    cp = ConfigParser.GlobalConfigParser()
+    cp = GlobalConfigParser()
     cp.read(configfile)
 
     print cp.items(group)
@@ -153,11 +170,11 @@ def pbs_runner(configfile, group):
         return
 
     if cp.has_option(group, "next_group_any"):
-        os.system("cd $PBS_O_WORKDIR ; qsub -l " +cp.get(group, "qsub_l_any")+" -W depend=afterany:${PBS_JOBID} -v STEP_CONFIG=" + configfile + ",STEP_GROUP=" + cp.get(group, "next_group_any") + " " +cp.get(group, "next_script_any"))
+        os.system("cd $PBS_O_WORKDIR ; qsub -l " +cp.get(group, "qsub_l_any")+" -N " + cp.get(group, "next_script_any") + "-" + cp.get(group, "next_group_any") + "-" + cp.get(group, "designator") + " -W depend=afterany:${PBS_JOBID} -v STEP_CONFIG=" + configfile + ",STEP_GROUP=" + cp.get(group, "next_group_any") + " " +cp.get(group, "next_script_any"))
 
     else:
-        os.system("cd $PBS_O_WORKDIR ; qsub -l "+cp.get(group, "qsub_l_ok")+" -W depend=afterok:${PBS_JOBID} -v STEP_CONFIG=" + configfile + ",STEP_GROUP=" + cp.get(group, "next_group_ok") + " " +cp.get(group, "next_script_ok"))
-        os.system("cd $PBS_O_WORKDIR ; qsub -l "+cp.get(group, "qsub_l_notok")+" -W depend=afternotok:${PBS_JOBID} -v STEP_CONFIG=" + configfile + ",STEP_GROUP=" + cp.get(group, "next_group_notok") + " " +cp.get(group, "next_script_notok"))
+        os.system("cd $PBS_O_WORKDIR ; qsub -l "+cp.get(group, "qsub_l_ok")+" -N " + cp.get(group, "next_script_ok") + "-" + cp.get(group, "next_group_ok") + "-" + cp.get(group, "designator") + " -W depend=afterok:${PBS_JOBID} -v STEP_CONFIG=" + configfile + ",STEP_GROUP=" + cp.get(group, "next_group_ok") + " " +cp.get(group, "next_script_ok"))
+        os.system("cd $PBS_O_WORKDIR ; qsub -l "+cp.get(group, "qsub_l_notok")+" -N " + cp.get(group, "next_script_notok") + "-" + cp.get(group, "next_group_notok") + "-" + cp.get(group, "designator") + " -W depend=afternotok:${PBS_JOBID} -v STEP_CONFIG=" + configfile + ",STEP_GROUP=" + cp.get(group, "next_group_notok") + " " +cp.get(group, "next_script_notok"))
 
 class GlobalConfigParser(ConfigParser.SafeConfigParser, object):
 
@@ -180,6 +197,50 @@ class GlobalConfigParser(ConfigParser.SafeConfigParser, object):
             elif super(GlobalConfigParser, self).has_option(global_section, option):
                 return True
             else:
-                False
+                return False
         else:
             return super(GlobalConfigParser, self).has_option(section, option)
+
+
+def argsinit():
+    if 'PBS_O_WORKDIR' in os.environ:
+        os.chdir(os.environ['PBS_O_WORKDIR'])
+
+    if 'STEP_GROUP' in os.environ:
+        group = os.environ['STEP_GROUP']
+    else:
+        group = sys.argv[2]
+
+    if 'STEP_CONFIG' in os.environ:
+        configfile = os.environ['STEP_CONFIG']
+    else:
+        configfile = sys.argv[1]
+
+    cp = GlobalConfigParser()
+    cp.read(configfile)
+
+    return (group, configfile, cp)
+
+def condition(cond):
+    return eval(cond)
+
+def check_clustering(filename, dist=3.5):
+    import iotools as iot
+    last_frame = iot.DLP2HReader(fileobj=filename)[-1]
+
+    if last_frame.get_chains(dist) == 1:
+        return True
+    else:
+        return False
+
+def test_conf():
+
+    if os.path.isfile("test1"):
+        if os.path.isfile("test2"):
+            return True
+        else:
+            os.system("touch test2")
+            return False
+    else:
+        os.system("touch test1")
+        return False

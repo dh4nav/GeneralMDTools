@@ -1,0 +1,72 @@
+#!/bin/bash -lx
+
+module load intelmpi
+module load intel64
+
+if [ -n "$PBS_O_WORKDIR" ]
+then
+    cd $PBS_O_WORKDIR
+fi
+
+DATESTAMP=$(date +%s)
+
+if [ -f CONFIG ]
+then
+    cp CONFIG CONFIG-${DATESTAMP}.dlpoly
+fi
+
+if [ -f "REVCON" ]
+then
+    I=$(wc -c REVCON | cut -d' ' -f1)
+    J=$(wc -c CONFIG | cut -d' ' -f1)
+    echo $I $J
+    if [ "$I" -eq "$J" ]
+    then
+        mv REVCON CONFIG
+        mv REVIVE REVOLD
+        cp CONTROLrestart CONTROL
+        echo $(date +%s) $DATESTAMP " REVCON found, length matches, using restart"
+    elif [ -f REVOLD ]
+    then
+        rm HISTORY OUTPUT STATIS REVCON REVIVE
+        cp CONTROLrestart CONTROL
+        echo $(date +%s) $DATESTAMP " REVCON found, length does not match. REVOLD found, dropping and restarting last step with restart"
+    else
+        rm HISTORY OUTPUT STATIS REVCON REVIVE
+        cp CONTROLnonrestart CONTROL
+        echo $(date +%s) $DATESTAMP " REVCON found, length does not match. REVOLD not found, dropping and restarting last step without restart"
+    fi
+
+else
+    cp CONTROLnonrestart CONTROL
+    rm HISTORY STATIS OUTPUT REVOLD REVIVE
+    echo $(date +%s) $DATESTAMP " REVCON not found, starting"
+fi
+
+if [ -f HISTORY ]
+then
+    mv HISTORY HISTORY-${DATESTAMP}.dlpolyhist
+    echo $(date +%s) $DATESTAMP " HISTORY found. Moving"
+    bzip2 HISTORY-${DATESTAMP}.dlpolyhist
+    echo $(date +%s) $DATESTAMP " ... and compressing"
+fi
+
+if [ -f STATIS ]
+then
+    mv STATIS STATIS-${DATESTAMP}
+    echo $(date +%s) $DATESTAMP " STATIS found. Moving"
+fi
+
+if [ -f OUTPUT ]
+then
+    mv OUTPUT OUTPUT-${DATESTAMP}
+    echo $(date +%s) $DATESTAMP " OUTPUT found. Moving"
+fi
+
+qsub -l nodes=14:ppn=40,walltime=05:00:00 -N $(basename $PBS_O_WORKDIR) -ma -W depend=afternotok:${PBS_JOBID} $0
+echo $(date +%s) $DATESTAMP " Next job submitted" $0
+
+DATESTAMP=$(date +%s)
+
+mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X
+echo $(date +%s) $DATESTAMP " Job finished"

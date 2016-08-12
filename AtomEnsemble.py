@@ -2,6 +2,7 @@ import collections as col
 import copy
 import numpy as np
 import scipy.spatial.distance as ssd
+import inspect
 
 class Atom(col.MutableMapping):
     """A dictionary that applies an arbitrary key-altering
@@ -251,17 +252,29 @@ class AtomEnsemble(col.MutableSequence):
     def filter(self, keep=None, remove=None):
         #cp = self.copy()
 
-        counter = 0
-        while counter < len(self.main_list):
-            if remove:
-                if self.main_list[counter]['element'] in remove:
-                    del self.main_list[counter]
-                    counter -= 1
-            elif keep:
-                if self.main_list[counter]['element'] not in keep:
-                    del self.main_list[counter]
-                    counter -= 1
-            counter += 1
+        # print self.main_list
+        # print keep
+        # print remove
+
+        if remove:
+            self.main_list = [x for x in self.main_list if x['element'] not in remove]
+        elif keep:
+            self.main_list = [x for x in self.main_list if x['element'] in keep]
+
+        # print self.main_list
+
+        return self
+        # counter = 0
+        # while counter < len(self.main_list):
+        #     if remove:
+        #         if self.main_list[counter]['element'] in remove:
+        #             del self.main_list[counter]
+        #             counter -= 1
+        #     elif keep:
+        #         if self.main_list[counter]['element'] not in keep:
+        #             del self.main_list[counter]
+        #             counter -= 1
+        #     counter += 1
 
         #return cp
 
@@ -475,3 +488,74 @@ class AtomEnsemble(col.MutableSequence):
             final_pair_list.append((translation_list_a[e[0]], translation_list_b[e[1]]))
 
         return final_pair_list
+
+    def debox_coordinate(self, ref, val, box):
+        """Return minum image convention distance between ref and var with box size *box*"""
+
+        if (ref - val) > (box/2.0):
+            return (val + box)
+        elif (ref - val) < ((-1.0) * (box/2.0)):
+            return (val - box)
+        else:
+            return val
+
+    def get_center_of_mass(self, atoms):
+        """Return center of mass of frame"""
+        summator = [0.0,0.0,0.0]
+
+        if type(atoms[0]) is not list:
+            atoms = [atoms]
+
+        for c in atoms:
+            summator[0] = summator[0] + c[0]
+            summator[1] = summator[1] + c[1]
+            summator[2] = summator[2] + c[2]
+
+        summator[0] = summator[0] / float(len(atoms))
+        summator[1] = summator[1] / float(len(atoms))
+        summator[2] = summator[2] / float(len(atoms))
+
+        return summator
+
+    def debox_intramolecule(self, start=0, end=None, box=None):
+
+        if box == None:
+            box = self.boxvector
+
+        if end == None:
+            end = len(self.main_list)
+
+        if (end - start) < 1:
+            return
+
+        """Return frame with atoms placed at minimum image convention positions, with first atom used as reference, for box diameter *box*"""
+
+        self['coordinate'] = [[self.debox_coordinate(self['coordinate'][start][0], c[0], box), self.debox_coordinate(self['coordinate'][start][1], c[1], box), self.debox_coordinate(self['coordinate'][start][2], c[2], box)] if start <= n < end else c for n, c in enumerate(self['coordinate'])]
+
+        return self
+
+    def debox_intermolecule(self, start=0, end=None, box=None, center_on=0, center_on_coordinates=None):
+        """Return frame with atoms placed at minimum image convention positions, with atom *center_on* used as reference, for box diameter *box*
+        End is pythonic, i.e. [start, end["""
+
+        if box == None:
+            box = self.boxvector
+
+        if end == None:
+            end = len(self.main_list)
+
+        centerref = None
+
+        if center_on != None:
+            centerref = self.get_center_of_mass(self['coordinate'][center_on])
+        elif center_on_coordinates != None:
+            centerref = center_on_coordinates
+        else:
+            raise ValueError("either center_on or center_on_coordinates need to be set")
+        #print [list((self.debox_coordinate(centerref[0], c[0], box), self.debox_coordinate(centerref[1], c[1], box), self.debox_coordinate(centerref[2], c[2], box))) for c in self['coordinate'][start:end]]
+
+        self['coordinate'] = [[self.debox_coordinate(centerref[0], c[0], box), self.debox_coordinate(centerref[1], c[1], box), self.debox_coordinate(centerref[2], c[2], box)] if start <= n < end else c for n, c in enumerate(self['coordinate'])]
+
+        #print self['coordinate'][2]
+
+        return self

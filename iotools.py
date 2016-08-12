@@ -20,13 +20,13 @@ class Reader(object):
 
     def __iter__(self):
         self.n = -1
-        print "IterStart"
+        #print "IterStart"
         return self
 
     def next(self):
         self.n += 1
         try:
-            print "Iter " + str(self.n)
+            #print "Iter " + str(self.n)
             return self.__getitem__(self.n)
         except EOFError:
             raise StopIteration

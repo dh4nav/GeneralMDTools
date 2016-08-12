@@ -5,26 +5,28 @@ sys.path.extend(["/home/hpc/bca1/bca109/bin/GeneralMDTools", "/home/t/Source/Gen
 
 import os
 import automationtools as at
-import ConfigParser
 
-if 'PBS_O_WORKDIR' in os.environ:
-    os.chdir(os.environ['PBS_O_WORKDIR'])
+os.environ["STEP_CONFIG"] = "conf"
+os.environ["STEP_GROUP"] = "S17"
 
-if 'STEP_GROUP' in os.environ:
-    group = os.environ['STEP_GROUP']
-else:
-    group = sys.argv[2]
+group = ""
+configfile = ""
+group, configfile, cp = at.argsinit()
 
-if 'STEP_CONFIG' in os.environ:
-    configfile = os.environ['STEP_CONFIG']
-else:
-    configfile = sys.argv[1]
-
-cp = ConfigParser.GlobalConfigParser()
-cp.read(configfile)
+at.check_and_move(cp.get(group, "move").split(), group)
+at.check_and_copy(cp.get(group, "copy").split(), group)
 
 at.mangle_config(configfile, group)
 
+if cp.has_option(group, "field_file"):
+    os.system("cp " + cp.get(group, "field_file") + " FIELD")
+
 at.pbs_runner(configfile, group)
+if cp.has_option(group, "condition"):
+    if at.condition(cp.get(group, "condition")):
+        print "cond+"
+        exit()
+    else:
+        print "cond-"
 
 os.system("cd $PBS_O_WORKDIR; " + cp.get(group, "executable"))

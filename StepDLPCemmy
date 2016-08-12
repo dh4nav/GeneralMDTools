@@ -1,7 +1,6 @@
-#!/bin/bash -lx
+#!/bin/bash -l
 
 module load intelmpi
 module load intel64
-cd ${PBS_O_WORKDIR}
 
 mpirun_rrze -npernode 20 -pinexpr N:0-19 ${HOME}/dlpc19emmy-intelmpi-ifort/execute/DLPOLY.X

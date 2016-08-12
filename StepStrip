@@ -35,7 +35,7 @@ last_frame = iot.DLP2HReader(fileobj="HISTORY")[-1]
 
 
 #Load add cluster
-add_cluster = iot.DLP2HReader(fileobj="AddCluster")[-1]
+#add_cluster = iot.DLP2HReader(fileobj="AddCluster")[-1]
 
 #Prepare last frame
 last_frame.filter(remove=["SD", "CD", "OD"])
@@ -53,43 +53,45 @@ if 'force' in last_frame:
 lf_radius = last_frame.get_enclosing_radius()
 print lf_radius
 #Prepare addcluster
-add_cluster.center()
-if 'velocity' not in add_cluster:
-    add_cluster['velocity'] = [[0.0, 0.0, 0.0]]  * len(add_cluster['element'])
+# add_cluster.center()
+# if 'velocity' not in add_cluster:
+#     add_cluster['velocity'] = [[0.0, 0.0, 0.0]]  * len(add_cluster['element'])
+#
+# if 'force' in add_cluster:
+#     try:
+#         del add_cluster['force']
+#     except KeyError:
+#         pass
+#
+# add_cluster.rotate_around_origin(frand(maxval=360.0), frand(maxval=360.0),
+#                                  frand(maxval=360.0), degrees=True)
+#
+# movevect = add_cluster.rotate_vector_around_origin([lf_radius+100.0, 0.0, 0.0],
+#                                                    frand(maxval=360.0),
+#                                                    frand(maxval=360.0),
+#                                                    frand(maxval=360.0),
+#                                                    degrees=True)
+#
+# add_cluster.move(movevect)
+# #add_cluster.accellerate(magnitude=-100.001, direction=movevect)
+#
+# mag = -1.0 * np.linalg.norm(movevect)
+#
+# test_cluster = last_frame + add_cluster
+#
+# while test_cluster.get_chains(dist=4.0) != 1:
+#     print "TC" + str(test_cluster.get_chains(dist=4.0))
+#     test_cluster = last_frame + add_cluster
+#     add_cluster.move(magnitude=-0.1, direction=movevect)
+#     print "Move in center: " + str(add_cluster.get_center())
+#
+# print "TC" + str(test_cluster.get_chains(dist=4.0))
+# print "Move in center: " + str(add_cluster.get_center())
+#
+# #Join clusters
+# new_cluster = last_frame + add_cluster
 
-if 'force' in add_cluster:
-    try:
-        del add_cluster['force']
-    except KeyError:
-        pass
-
-add_cluster.rotate_around_origin(frand(maxval=360.0), frand(maxval=360.0),
-                                 frand(maxval=360.0), degrees=True)
-
-movevect = add_cluster.rotate_vector_around_origin([lf_radius+100.0, 0.0, 0.0],
-                                                   frand(maxval=360.0),
-                                                   frand(maxval=360.0),
-                                                   frand(maxval=360.0),
-                                                   degrees=True)
-
-add_cluster.move(movevect)
-#add_cluster.accellerate(magnitude=-100.001, direction=movevect)
-
-mag = -1.0 * np.linalg.norm(movevect)
-
-test_cluster = last_frame + add_cluster
-
-while test_cluster.get_chains(dist=4.0) != 1:
-    print "TC" + str(test_cluster.get_chains(dist=4.0))
-    test_cluster = last_frame + add_cluster
-    add_cluster.move(magnitude=-0.1, direction=movevect)
-    print "Move in center: " + str(add_cluster.get_center())
-
-print "TC" + str(test_cluster.get_chains(dist=4.0))
-print "Move in center: " + str(add_cluster.get_center())
-
-#Join clusters
-new_cluster = last_frame + add_cluster
+new_cluster = last_frame
 
 #construct field file
 ff = ft.FieldCollection(input_file="FIELD_vdw_minus")
