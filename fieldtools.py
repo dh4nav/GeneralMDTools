@@ -21,69 +21,105 @@ class FieldCollection(object):
 
     def read_next(self):
         self.counter += 1
-        #print str(self.counter-1) + ": " + self.lines[self.counter-1]
+        # print(str(self.counter-1) + ": " + self.lines[self.counter-1])
         return self.lines[self.counter-1].strip()
 
-    def append_molecule(self, input_file=None, nummols=1):
-        if input_file:
+    def append_molecule(self, input_file=None):
+        if self.counter == 0:
             with open(input_file) as f:
                 self.read_init(f)
-            typelist = [""]
-            lenlist = [0]
 
-            while True:
-                # elements = self.read_next().split()
-                #
-                # if elements[0].lower() == "close":
-                #     return
-                #
-                # typelist.append(elements[0].lower())
-                # lenlist.append(elements[1])
+        #while True:
+            # elements = self.read_next().split()
+            #
+            # if elements[0].lower() == "close":
+            #     return
+            #
+            # typelist.append(elements[0].lower())
+            # lenlist.append(elements[1])
 
-                molcol_index = 0
-                for n, i in enumerate(self.itemlist):
-                    if type(i) == MoleculeCollection:
-                        molcol_index = n
-                        break
+            # molcol_index = 0
+            # for n, i in enumerate(self.itemlist):
+            #     if type(i) == MoleculeCollection:
+            #         molcol_index = n
+            #         break
 
-                for n in range(nummols):
-                    #print "m"
-                    self.itemlist[molcol_index].molecules.append(Molecule())
-                    self.itemlist[molcol_index].molecules[-1].name = self.read_next() # molecule name
-                    self.itemlist[molcol_index].molecules[-1].nummols = self.read_next().split()[1]
-                    while True:
-                        elements = self.read_next().split()
-                        elements[0] = elements[0].lower()
-                        if elements[0] == "atoms":
-                            for i in range(int(elements[1])):
-                                self.itemlist[molcol_index].molecules[-1].fields['atoms'].append(atom(input_file=self.read_next()))
-                        # TODO add shell directive
-                        elif elements[0] == "bonds":
-                            for i in range(int(elements[1])):
-                                self.itemlist[molcol_index].molecules[-1].fields['bonds'].append(bond(input_file=self.read_next()))
-                        elif elements[0] == "constraints":
-                            for i in range(int(elements[1])):
-                                self.itemlist[molcol_index].molecules[-1].fields['constraints'].append(constraint(input_file=self.read_next()))
-                        # TODO add pmf
-                        elif elements[0] == "angles":
-                            for i in range(int(elements[1])):
-                                self.itemlist[molcol_index].molecules[-1].fields['angles'].append(angle(input_file=self.read_next()))
-                        elif elements[0] == "dihedrals":
-                            for i in range(int(elements[1])):
-                                self.itemlist[molcol_index].molecules[-1].fields['dihedrals'].append(dihedral(input_file=self.read_next()))
-                        elif elements[0] == "inversions":
-                            for i in range(int(elements[1])):
-                                self.itemlist[molcol_index].molecules[-1].fields['inversions'].append(inversion(input_file=self.read_next()))
-                        # elif elements[0] == "rigid":
-                        #     for i in range(int(elements[1])):
-                        #         self.itemlist[molcol_index].molecules[-1].fields['rigid'].append(atom(input_file=self.read_next()))
-                        # elif elements[0] == "teth":
-                        #     for i in range(int(elements[1])):
-                        #         self.itemlist[molcol_index].molecules[-1].fields['teth'].append(tether(input_file=self.read_next()))
-                        elif elements[0] == "finish":
-                            return
-                typelist.pop()
-                lenlist.pop()
+        molcol_index = -1
+
+
+        #print "m"
+        self.itemlist[molcol_index].molecules.append(Molecule(self))
+        # self.itemlist[molcol_index].molecules[-1].name = self.read_next() # molecule name
+        # self.read_token()
+        # self.itemlist[molcol_index].molecules[-1].nummols = self.lenlist[-1]
+        #
+        # while True:
+        #     self.read_token()
+        #
+        #     if self.tokenlist[-1] == "atoms":
+        #         for _ in range(self.lenlist[-1]):
+        #             self.itemlist[molcol_index].molecules[-1].fields['atoms'].append(atom(input_file=self.read_next()))
+        #         self.tokenlist.pop()
+        #         self.lenlist.pop()
+        #
+        #     elif self.tokenlist[-1] == "bonds":
+        #         for _ in range(self.lenlist[-1]):
+        #             self.itemlist[molcol_index].molecules[-1].fields['bonds'].append(bond(input_file=self.read_next()))
+        #         self.tokenlist.pop()
+        #         self.lenlist.pop()
+        #
+        #     elif self.tokenlist[-1] == "constraints":
+        #         for _ in range(self.lenlist[-1]):
+        #             self.itemlist[molcol_index].molecules[-1].fields['constraints'].append(constraint(input_file=self.read_next()))
+        #         self.tokenlist.pop()
+        #         self.lenlist.pop()
+        #
+        #     elif self.tokenlist[-1] == "angles":
+        #         for _ in range(self.lenlist[-1]):
+        #             self.itemlist[molcol_index].molecules[-1].fields['angles'].append(angle(input_file=self.read_next()))
+        #         self.tokenlist.pop()
+        #         self.lenlist.pop()
+        #
+        #     elif self.tokenlist[-1] == "constraints":
+        #         for _ in range(self.lenlist[-1]):
+        #             self.itemlist[molcol_index].molecules[-1].fields['constraints'].append(constraint(input_file=self.read_next()))
+        #         self.tokenlist.pop()
+        #         self.lenlist.pop()
+        #
+        #     elif self.tokenlist[-1] == "dihedrals":
+        #         for _ in range(self.lenlist[-1]):
+        #             self.itemlist[molcol_index].molecules[-1].fields['dihedrals'].append(dihedral(input_file=self.read_next()))
+        #         self.tokenlist.pop()
+        #         self.lenlist.pop()
+        #
+        #     elif self.tokenlist[-1] == "inversions":
+        #         for _ in range(self.lenlist[-1]):
+        #             self.itemlist[molcol_index].molecules[-1].fields['inversions'].append(inversion(input_file=self.read_next()))
+        #         self.tokenlist.pop()
+        #         self.lenlist.pop()
+        #
+        #     elif self.tokenlist[-1] == "finish":
+        #         self.tokenlist.pop()
+        #         self.lenlist.pop()
+        #         return
+        #
+        #     else:
+        #         raise ValueError("Unexpected token: " + self.tokenlist[-1] + " in line " + str(self.counter))
+
+
+    def read_token(self, readstring = None):
+        if readstring == None:
+            readstring = self.read_next()
+
+        readelements = readstring.split()
+
+        self.tokenlist.append(readelements[0].lower())
+
+        if len(readelements) > 1:
+            self.lenlist.append(int(readelements[1]))
+        else:
+            self.lenlist.append(None)
+
 
     def __init__(self, input_file=None):
         """Constructor
@@ -93,11 +129,12 @@ class FieldCollection(object):
         self.units = "kcal"
         self.neutralchargegroups = False
         self.itemlist.append(MoleculeCollection())
+        self.lines = 0
+        self.tokenlist = []
+        self.lenlist = []
         if input_file:
             with open(input_file) as f:
                 self.read_init(f)
-            typelist = []
-            lenlist = []
 
             self.title = self.read_next() # comment/title
             self.units = self.read_next().split()[1] #unit
@@ -105,36 +142,37 @@ class FieldCollection(object):
 
 
             while True:
-                elements = self.read_next().split()
+                if len(self.tokenlist) == 0:
+                    self.read_token()
 
-                print elements
-
-                if elements[0].lower() == "close":
+                if self.tokenlist[-1] == "close":
                     break
 
-                typelist.append(elements[0].lower())
-                if len(elements) > 1:
-                    lenlist.append(elements[1])
+                elif self.tokenlist == ["molecules"]:
+                    for _ in range(self.lenlist[0]):
+                        self.append_molecule()
+                        print("m")
+                    self.tokenlist.pop()
+                    self.lenlist.pop()
 
-                if typelist[-1] == "molecules":
-                    self.itemlist.append(MoleculeCollection())
-                    self.append_molecule(input_file, nummols=int(elements[1]))
-                    print "m"
-
-                elif typelist[-1] == 'vdw':
-                    #print "v"
+                elif self.tokenlist == ["vdw"]:
                     self.itemlist.append(vdws())
-                    for _ in range(int(lenlist[0])):
+                    for _ in range(self.lenlist[0]):
                         self.itemlist[-1].fields.append(vdw_special(self.read_next()))
-                    print "v"
+                        print("v")
+                    self.tokenlist.pop()
+                    self.lenlist.pop()
 
+                elif self.tokenlist == ["extern"]:
+                    for _ in range(self.lenlist[0]):
+                        print("e")
+                        self.itemlist.append(extern(self.read_next()))
+                        self.itemlist[-1].read(self.read_next())
+                    self.tokenlist.pop()
+                    self.lenlist.pop()
 
-                elif typelist[-1] == 'extern':
-                    print "e"
-                    self.itemlist.append(extern(self.read_next()))
-                    #for _ in range(int(lenlist[0])-1):
-                    #for now just read one line
-                    self.itemlist[-1].read(self.read_next())
+                else:
+                    raise ValueError("Unexpected token: " + self.tokenlist[-1] + " in line " + str(self.counter))
 
     def __str__(self):
         returnstring = [self.title.strip()]
@@ -199,11 +237,75 @@ class MoleculeCollection(object):
 
 
 class Molecule(object):
-    def __init__(self):
+    def __init__(self, inobject=None):
 
         self.fields = OrderedDict([('atoms', []), ('shells', []), ('bonds', []), ('constraints', []), ('pmf', []), ('angles', []), ('dihedrals', []), ('inversions', []), ('rigids', []), ('tethers', [])])
         self.nummols = 1
         self.name = "Name"
+
+        if inobject != None:
+
+            self.name = inobject.read_next() # molecule name
+            inobject.read_token()
+            self.nummols = inobject.lenlist[-1]
+            inobject.tokenlist.pop()
+            inobject.lenlist.pop()
+            while True:
+                inobject.read_token()
+
+                if inobject.tokenlist[-1] == "atoms":
+                    for _ in range(inobject.lenlist[-1]):
+                        self.fields['atoms'].append(atom(input_file=inobject.read_next()))
+                    inobject.tokenlist.pop()
+                    inobject.lenlist.pop()
+
+                elif inobject.tokenlist[-1] == "bonds":
+                    for _ in range(inobject.lenlist[-1]):
+                        self.fields['bonds'].append(bond(input_file=inobject.read_next()))
+                    inobject.tokenlist.pop()
+                    inobject.lenlist.pop()
+
+                elif inobject.tokenlist[-1] == "constraints":
+                    for _ in range(inobject.lenlist[-1]):
+                        self.fields['constraints'].append(constraint(input_file=inobject.read_next()))
+                    inobject.tokenlist.pop()
+                    inobject.lenlist.pop()
+
+                elif inobject.tokenlist[-1] == "angles":
+                    for _ in range(inobject.lenlist[-1]):
+                        self.fields['angles'].append(angle(input_file=inobject.read_next()))
+                    inobject.tokenlist.pop()
+                    inobject.lenlist.pop()
+
+                elif inobject.tokenlist[-1] == "constraints":
+                    for _ in range(inobject.lenlist[-1]):
+                        self.fields['constraints'].append(constraint(input_file=inobject.read_next()))
+                    inobject.tokenlist.pop()
+                    inobject.lenlist.pop()
+
+                elif inobject.tokenlist[-1] == "dihedrals":
+                    for _ in range(inobject.lenlist[-1]):
+                        self.fields['dihedrals'].append(dihedral(input_file=inobject.read_next()))
+                    inobject.tokenlist.pop()
+                    inobject.lenlist.pop()
+
+                elif inobject.tokenlist[-1] == "inversions":
+                    for _ in range(inobject.lenlist[-1]):
+                        self.fields['inversions'].append(inversion(input_file=inobject.read_next()))
+                    inobject.tokenlist.pop()
+                    inobject.lenlist.pop()
+
+                elif inobject.tokenlist[-1] == "finish":
+                    inobject.tokenlist.pop()
+                    inobject.lenlist.pop()
+                    return
+
+                else:
+                    raise ValueError("Unexpected token: " + inobject.tokenlist[-1] + " in line " + str(inobject.counter))
+
+
+
+
 
     def __str__(self):
         returnstring = [self.name + "\nnummols " + str(self.nummols)]

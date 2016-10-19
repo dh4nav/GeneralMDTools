@@ -1,7 +1,10 @@
 
 import os, sys
 import datetime
-import ConfigParser
+if sys.version_info[0] >= 3:
+    import configparser as copa
+else:
+    import ConfigParser as copa
 #import shutil as su
 
 def move_and_timestamp_file(filenames, postfix=None, add_date=True, separator="_", copy=False):
@@ -22,10 +25,10 @@ def move_and_timestamp_file(filenames, postfix=None, add_date=True, separator="_
 
             if copy:
                 os.system("cp " + fn + " " + os.path.join(splitpath[0], spb1))
-                print "cp " + fn + " " + os.path.join(splitpath[0], spb1)
+                print("cp " + fn + " " + os.path.join(splitpath[0], spb1))
             else:
                 os.rename(fn, os.path.join(splitpath[0], spb1))
-                print "mv " + fn + " " + os.path.join(splitpath[0], spb1)
+                print("mv " + fn + " " + os.path.join(splitpath[0], spb1))
 
 
 
@@ -93,16 +96,16 @@ def mod_parameters(filename_source, filename_target, parameters, modifications, 
     for line in infilehandle:
         try:
             index = parameters.index(line.split()[0].strip())
-            print index
-            print actions[index]
+            print(index)
+            print(actions[index])
             if (actions[index] == "REPLACE") | (actions[index] == "ADDREPLACE"):
-                print "case 1"
+                print("case 1")
                 outfilehandle.write(modifications[index]+"\n")
                 del actions[index]
                 del modifications[index]
                 del parameters[index]
             elif (actions[index] == "REMOVE") | (actions[index] == "ADD"):
-                print "case 2"
+                print("case 2")
                 del actions[index]
                 del modifications[index]
                 del parameters[index]
@@ -120,23 +123,23 @@ def mod_parameters(filename_source, filename_target, parameters, modifications, 
 def mangle_config(configfile, group):
     cp = GlobalConfigParser()
     cp.read(configfile)
-    print "R0"
+    print("R0")
 
     if os.path.isfile(group+"R"):
         cpitems = cp.get(group, "control_changes_restart")
         os.system("mv REVCON CONFIG; mv REVIVE REVOLD")
-        print "R1"
+        print("R1")
     else:
         cpitems = cp.get(group, "control_changes")
         if cp.has_option(group, "use_revcon"):
             os.system("mv REVCON CONFIG")
-            print "R2"
+            print("R2")
         if cp.has_option(group, "control_changes_restart"):
             os.system("touch " + group + "R")
-            print "R3"
+            print("R3")
 
-    print "-+-"
-    print cpitems
+    print("-+-")
+    print(cpitems)
 
     params = ["finish"]
     mods = [""]
@@ -153,9 +156,9 @@ def mangle_config(configfile, group):
     mods.append("finish")
     acts.append("ADD")
 
-    print params
-    print mods
-    print acts
+    # print params
+    # print mods
+    # print acts
 
     mod_parameters(cp.get(group, "control_source"), cp.get(group, "control_target"), params, mods, acts)
 
@@ -163,8 +166,8 @@ def pbs_runner(configfile, group):
     cp = GlobalConfigParser()
     cp.read(configfile)
 
-    print cp.items(group)
-    print [x[0] for x in cp.items(group)]
+    # print cp.items(group)
+    # print [x[0] for x in cp.items(group)]
 
     if cp.has_option(group, "finish"):
         return
@@ -176,7 +179,7 @@ def pbs_runner(configfile, group):
         os.system("cd $PBS_O_WORKDIR ; qsub -l "+cp.get(group, "qsub_l_ok")+" -N " + cp.get(group, "next_script_ok") + "-" + cp.get(group, "next_group_ok") + "-" + cp.get(group, "designator") + " -W depend=afterok:${PBS_JOBID} -v STEP_CONFIG=" + configfile + ",STEP_GROUP=" + cp.get(group, "next_group_ok") + " " +cp.get(group, "next_script_ok"))
         os.system("cd $PBS_O_WORKDIR ; qsub -l "+cp.get(group, "qsub_l_notok")+" -N " + cp.get(group, "next_script_notok") + "-" + cp.get(group, "next_group_notok") + "-" + cp.get(group, "designator") + " -W depend=afternotok:${PBS_JOBID} -v STEP_CONFIG=" + configfile + ",STEP_GROUP=" + cp.get(group, "next_group_notok") + " " +cp.get(group, "next_script_notok"))
 
-class GlobalConfigParser(ConfigParser.SafeConfigParser, object):
+class GlobalConfigParser(copa.SafeConfigParser, object):
 
     def get(self, section, option, use_global=True, global_section="global"):
         if use_global:

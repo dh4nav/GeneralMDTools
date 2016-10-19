@@ -207,18 +207,18 @@ class AtomEnsemble(col.MutableSequence):
             return oa
             #return self.copy().main_list.extend(obj.main_list)
         elif type(obj) == list:
-            print "."
-            print oa
-            print ".."
-            print oa.main_list
-            print "..."
+            # print "."
+            # print oa
+            # print ".."
+            # print oa.main_list
+            # print "..."
             oa.main_list.reverse()
-            print oa.main_list
-            print "...."
+            # print oa.main_list
+            # print "...."
             obj.main_list.reverse()
             oa.main_list.append(obj.main_list)
             oa.main_list.reverse()
-            print oa.main_list
+            # print oa.main_list
             #reverse(reverse(oa.main_list).append(reverse(obj.main_list)))
             #oa.main_list.insert(0, obj)
             return oa
@@ -239,7 +239,7 @@ class AtomEnsemble(col.MutableSequence):
         return self
 
     def __mul__(self, val):
-        print "m"
+        # print "m"
         cp = self.copy()
         cp.main_list = cp.main_list * val
         return cp
@@ -304,9 +304,9 @@ class AtomEnsemble(col.MutableSequence):
             center_coordinates = np.array(center_coordinates)
         else:
             center_coordinates = self.get_center()
-        print "C1" + str(self.get_center())
+        # print "C1" + str(self.get_center())
         self.move(-1.0 * center_coordinates)
-        print "C2" + str(self.get_center())
+        # print "C2" + str(self.get_center())
 
     def move(self, movevect=None, magnitude=None, direction=None):
         if type(movevect) == type(None):
@@ -411,11 +411,11 @@ class AtomEnsemble(col.MutableSequence):
             if e < mindist:
                 dellist.extend(range(n-(n%mollen), n+mollen-((n%mollen))))
                 skipflag = True
-        print dellist
+        # print dellist
         for e in reversed(dellist):
             del o2[e]
         self += o2
-        print self['element']
+        # print self['element']
 
     def get_chains(self, dist=2.0):
 

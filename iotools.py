@@ -51,13 +51,13 @@ class Reader(object):
         #skip preamble if specified
         if self.filehandle.tell() == self.frameindex[0]:
             if preamble_length != None:
-                for _ in xrange(preamble_length):
+                for _ in range(preamble_length):
                     if len(self.filehandle.readline()) == 0:
                         raise EOFError
 
         #read frame_length lines if specified and return position
         if frame_length != None:
-            for _ in xrange(frame_length):
+            for _ in range(frame_length):
                 if len(self.filehandle.readline()) == 0:
                     raise EOFError
             return self.filehandle.tell()
@@ -92,7 +92,7 @@ class Reader(object):
 
         #read frame_length lines if specified and return position
         if frame_length != None:
-            for _ in xrange(frame_length):
+            for _ in range(frame_length):
                 line = self.filehandle.readline()
                 if len(line) == 0:
                     raise EOFError
@@ -127,7 +127,7 @@ class Reader(object):
 
         #frame unknown and positive
         elif framenum > -1:
-            for i in xrange(framenum+1):
+            for i in range(framenum+1):
                 if i == framenum:
                     return self._get_frame(seek=self.frameindex[framenum], frame_length=self.framelength, frame_number=framenum)
                 elif i+1 in self.frameindex:
@@ -181,12 +181,15 @@ class XYZReader(Reader):
             ensemble.filename = self.filehandle.name
             ensemble.framenumber = frame_number
 
-            for i in xrange(frame_length):
+            for i in range(frame_length):
                 line = self.filehandle.readline().strip()
                 if len(line) == 0:
                     raise EOFError
                 if i == 1:
-                    ensemble.boxvector = float(line)
+                    try:
+                        ensemble.boxvector = float(line.split()[0])
+                    except ValueError:
+                        ensemble.boxvector = 0.0
                 elif i > 1:
                     elements = line.split()
                     atomproperties['element'] = elements[0]
@@ -276,7 +279,7 @@ class DLP2HReader(Reader):
             atom_length = self.trajectory_key + 2
             atomproperties = dict()
 
-            for i in xrange(frame_length):
+            for i in range(frame_length):
                 line = self.filehandle.readline()
                 if len(line) == 0:
                     raise EOFError
@@ -287,7 +290,7 @@ class DLP2HReader(Reader):
                         if frame_number != None:
                             zeropos = self.frameindex[frame_number-1]
                             self.frameindex = {0:zeropos}
-                            print "HISTORY read reset"
+                            print("HISTORY read reset")
                             return self._get_frame(seek, frame_length, marker, frame_number)
                         else:
                             raise SyntaxError("Word timestep not found. Frame:" + str(frame_number) + ", Line:" + str(i))
@@ -369,7 +372,7 @@ class XYZWriter(Writer):
             self.filehandle.write(frame.header + "\n")
 
     def _write_main(self, frame=None):
-        for i in xrange(len(frame['element'])):
+        for i in range(len(frame['element'])):
             self.filehandle.write(frame['element'][i])
             self.filehandle.write(" " + str(frame['coordinate'][i][0]) + " " + str(frame['coordinate'][i][1]) + " " + str(frame['coordinate'][i][2]))
             if 'mass' in frame:
@@ -432,7 +435,7 @@ class DLP2CWriter(Writer):
         if 'force' in frame:
             fo = frame['force']
 
-        for i in xrange(len(frame['element'])):
+        for i in range(len(frame['element'])):
             self.filehandle.write('\n{0:8s}{1:10d}'.format(frame['element'][i], i+1))
             #co = frame['coordinate'][i]
             self.filehandle.write('\n{0:20.12E}{1:20.12E}{2:20.12E}'.format(co[i][0], co[i][1], co[i][2]))
